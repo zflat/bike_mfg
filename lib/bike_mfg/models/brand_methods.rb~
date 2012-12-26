@@ -1,0 +1,12 @@
+module BikeMfg
+  module Models
+    module BrandMethods
+      def self.included(base)
+        
+        attr_accessable :brand
+        
+        
+      end # self.included
+    end
+  end
+end
