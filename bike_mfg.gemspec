@@ -5,11 +5,11 @@ require 'bike_mfg/version'
 
 Gem::Specification.new do |gem|
   gem.name          = "bike_mfg"
-  gem.version       = BikeMfg::VERSION
+  gem.version       = BikeBrand::VERSION
   gem.authors       = ["William Wedler"]
   gem.email         = ["wwedler@riseup.net"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Add bike brand and model information to an application}
+  gem.summary       = %q{Bike brand and model information as a model, database migration, seed data, REST interface and more}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
