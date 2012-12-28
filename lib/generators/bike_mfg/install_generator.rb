@@ -43,18 +43,18 @@ module BikeMfg
       end
     end
 
-    def assets
-      if asset_pipeline_enabled?
-        directory "app/assets"
-        copy_file "vendor/assets/stylesheets/custom.sass"
-      else
-        directory "../../../assets/javascripts", "public/javascripts"
-        directory "../../../assets/images", "public/images"
-        directory "../../../assets/stylesheets/surveyor", "public/stylesheets/surveyor"
-        copy_file "../../../assets/stylesheets/surveyor.sass", "public/stylesheets/sass/surveyor.sass"
-        copy_file "vendor/assets/stylesheets/custom.sass", "public/stylesheets/sass/custom.sass"
-      end
-    end
+#    def assets
+#      if asset_pipeline_enabled?
+#        directory "app/assets"
+#        copy_file "vendor/assets/stylesheets/custom.sass"
+#      else
+#        directory "../../../assets/javascripts", "public/javascripts"
+#        directory "../../../assets/images", "public/images"
+#        directory "../../../assets/stylesheets/surveyor", "public/stylesheets/surveyor"
+#        copy_file "../../../assets/stylesheets/surveyor.sass", "public/stylesheets/sass/surveyor.sass"
+#        copy_file "vendor/assets/stylesheets/custom.sass", "public/stylesheets/sass/custom.sass"
+#      end
+#    end
 
 #    def surveys
 #      copy_file "surveys/kitchen_sink_survey.rb"
@@ -62,8 +62,8 @@ module BikeMfg
 #      copy_file "surveys/date_survey.rb"
 #    end
 
-    def locales
-      directory "config/locales"
-    end
+#    def locales
+#      directory "config/locales"
+#    end
   end
 end

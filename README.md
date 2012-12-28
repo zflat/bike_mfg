@@ -1,6 +1,6 @@
 # BikeMfg
 
-TODO: Write a gem description
+Bike brand and model information as a model, database migration, seed data, REST interface and more
 
 ## Installation
 
@@ -15,6 +15,18 @@ And then execute:
 Or install it yourself as:
 
     $ gem install bike_mfg
+
+### Configuration
+
+Run the generator:
+
+	rails generate bike_mfg:install
+
+Then migrate the database:
+
+	rake db:migrate
+
+
 
 ## Usage
 
