@@ -26,7 +26,9 @@ Then migrate the database:
 
 	rake db:migrate
 
+Load the data into the database
 
+	rake db:bike_mfg:seed
 
 ## Usage
 
