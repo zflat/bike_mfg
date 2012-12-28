@@ -15,4 +15,10 @@ Gem::Specification.new do |gem|
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
+
+  
+  gem.add_dependency( "activesupport", ">= 0")
+  gem.add_dependency( "squeel", "~> 1.0.14")
+  gem.add_dependency( "rabl", "~> 0.7.9")
+  gem.add_dependency( "oj", ">= 0")
 end
