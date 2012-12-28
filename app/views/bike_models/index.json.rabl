@@ -7,7 +7,11 @@ node do |m|
  {:more => false}
 end
 
-node(:results) do
-  @models.map { |o| {:text => o.name, :id => o.id} }
+#node(:results) do
+#  @models.map { |o| {:text => o.name, :id => o.id} } unless @models.nil?
+#end
+
+node(:results) do |m|
+  @brands.map { |b| {:text => b.name, :children => b.models.map { |m| {:text => m.name, :id => m.id} } } }
 end
 

@@ -20,7 +20,7 @@ module BikeMfg
         models_found.each do |model|
           b = model.bike_brand
           brands[b.id] ||= blank_h(b)
-          brands[b.id][:models] << model.name
+          brands[b.id][:models] << model
         end
 
         brands_found = BikeBrand.where{name =~ "%#{term}%"}
