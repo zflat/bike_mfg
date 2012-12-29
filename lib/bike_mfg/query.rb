@@ -24,8 +24,14 @@ module BikeMfg
         end
 
         brands_found = BikeBrand.where{name =~ "%#{term}%"}
+        
         brands_found.each do |b|
-          brands[b.id] ||= blank_h(b)
+          if brands[b.id].nil?
+            brands[b.id] = blank_h(b)
+            b.models.each do |m|
+              brands[b.id][:models] << m
+            end
+          end
         end
         
         brands.map{ |key, val| OpenStruct.new val }

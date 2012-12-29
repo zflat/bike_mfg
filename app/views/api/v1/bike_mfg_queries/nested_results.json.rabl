@@ -13,7 +13,7 @@ end
 
 node(:results) do |m|
   if @results
-    @results.map { |b| {:text => b.name, :children => b.models.map { |m| {:text => m.name, :id => m.id} } } }
+    @results.map { |b| {:text => b.name, :children => b.models.map { |m| {:text => m.name, :id => m.id, :brand => m.brand.name} } } }
   else
     {}
   end
