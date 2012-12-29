@@ -7,7 +7,7 @@ module BikeMfg
 
     # instance methods    
     def brand
-      self.bike_model.brand
+      self.bike_model.brand if self.bike_model
     end
     def model
       self.bike_model
