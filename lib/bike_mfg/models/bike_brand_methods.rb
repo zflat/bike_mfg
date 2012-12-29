@@ -4,7 +4,7 @@ module BikeMfg
       def self.included(base)
         base.send :has_many, :bike_models
         base.send :attr_accessible, :name
-        base.send :validates_precense_of, :name
+        base.send :validates_presence_of, :name
       end # self.included
 
       # instance methods
