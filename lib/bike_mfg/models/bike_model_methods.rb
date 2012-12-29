@@ -3,7 +3,8 @@ module BikeMfg
     module BikeModelMethods
       def self.included(base)
         base.send :belongs_to, :bike_brand
-        base.send :attr_accessible, :name
+        base.send :attr_accessible, :name, :bike_brand_id
+        base.send :validates_precense_of, :name, :bike_brand_id
       end # self.included
 
       # instance methods

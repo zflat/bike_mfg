@@ -1,5 +1,6 @@
 require 'bike_mfg/version'
 require 'bike_mfg/query'
+require 'bike_mfg/acts_as_manufacturable'
 require 'squeel'
 require 'rabl'
 
