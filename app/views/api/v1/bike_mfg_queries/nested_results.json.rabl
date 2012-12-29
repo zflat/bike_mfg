@@ -12,6 +12,10 @@ end
 #end
 
 node(:results) do |m|
-  @brands.map { |b| {:text => b.name, :children => b.models.map { |m| {:text => m.name, :id => m.id} } } }
+  if @results
+    @results.map { |b| {:text => b.name, :children => b.models.map { |m| {:text => m.name, :id => m.id} } } }
+  else
+    {}
+  end
 end
 

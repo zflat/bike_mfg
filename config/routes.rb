@@ -1,3 +1,16 @@
 Rails.application.routes.draw do
-  resources :bike_models, :only => [:index]
+
+  namespace :api do
+    namespace :v1 do
+      resources :bike_mfg_queries, :only=>[:index] do
+        collection do
+          get 'search'
+          get 'search_models'
+          get 'search_brands'
+        end
+      end
+    end
+  end
+
+
 end
