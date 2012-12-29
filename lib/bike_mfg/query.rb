@@ -3,7 +3,7 @@ require 'ostruct'
 module BikeMfg
   class ModelCollectionQuery
     def initialize(search_phrase, scope = BikeModel)
-      @term = search_phrase
+      @term = search_phrase.strip unless search_phrase.blank?
       @scope = scope
     end
     
@@ -50,7 +50,7 @@ module BikeMfg
 
   class NameQuery
     def initialize(search_phrase, scope)
-      @term = search_phrase
+      @term = search_phrase.strip if search_phrase
       @scope = scope
     end
 
