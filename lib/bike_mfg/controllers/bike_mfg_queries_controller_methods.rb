@@ -6,15 +6,14 @@ module BikeMfg
         base.send :respond_to, :json
       end
       
-
       # Actions
       def search_models
-        @results = query_by_name BikeModel
+        @results = BikeMfg::NameQuery.new(term, BikeModel).find_each
         render :flat_results and return
       end
 
       def search_brands
-        @results = query_by_name BikeBrand
+        @results = BikeMfg::NameQuery.new(term, BikeBrand).find_each
         render :flat_results and return
       end
 
@@ -26,11 +25,7 @@ module BikeMfg
       private
 
       def term
-        params[:term]
-      end
-      
-      def query_by_name(scope)
-        scope.where{name =~ "%#{term}%"} if term.present?        
+        params[:q]
       end
       
     end

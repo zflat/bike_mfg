@@ -11,8 +11,8 @@ module BikeMfg
       @term
     end
     
-    def find_each(search_phrase = nil, &block)
-      term = search_phrase || search_term
+    def find_each(&block)
+      term = search_term
       
       if term.present?
         brands = {}
@@ -41,5 +41,26 @@ module BikeMfg
     end
     
   end #  ModelCollectionQuery
+
+  class NameQuery
+    def initialize(search_phrase, scope)
+      @term = search_phrase
+      @scope = scope
+    end
+
+    def search_term
+      @term
+    end
+
+    def find_each(&block)
+      term = search_term
+
+      if term.present?
+        @scope.where{name =~ "%#{term}%"}
+      else
+        nil
+      end
+    end # find_each
+  end # class NameQuery
 end
   
