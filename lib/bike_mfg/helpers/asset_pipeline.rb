@@ -6,7 +6,7 @@ module BikeMfg
       #
       # The detection scheme used here was ripped from jquery-rails.
       def asset_pipeline_enabled?
-        ::Rails.version >= "3.1" && ::Rails.application.config.assets.enabled
+        defined?(Rails) && ::Rails.version >= "3.1" && ::Rails.application.config.assets.enabled
       end
     end
   end

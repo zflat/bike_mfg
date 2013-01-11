@@ -50,7 +50,7 @@ module BikeMfg
       end # if term.present?
     end
 
-    def blank_brand(brand, indirect=false)
+    def self.blank_brand(brand, indirect=false)
       Hash.new do |h,k|
         case k.to_sym
           when :name then brand.name
