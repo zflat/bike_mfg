@@ -4,14 +4,13 @@ module BikeMfg
       base.send :belongs_to, :bike_model
       base.send :attr_accessible, :bike_model_id
     end # self.included
-
-    # instance methods    
+    
     def brand
-      self.bike_model.brand if self.bike_model
+      bike_model.brand if bike_model
     end
     def model
-      self.bike_model
+      bike_model
     end
-    
+
   end
 end

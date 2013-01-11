@@ -1,5 +1,5 @@
-require 'rails'
 require 'bike_mfg'
+require 'rails'
 
 module BikeMfg
   class Engine < Rails::Engine

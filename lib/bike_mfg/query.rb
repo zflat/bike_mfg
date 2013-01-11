@@ -1,5 +1,15 @@
 require 'ostruct'
 
+class BrandHash < Hash
+
+  def initialize(brand, indirect=false)
+    super
+    self[:name] = brand.name
+    self[:indrect] = indirect
+  end
+
+end
+
 module BikeMfg
   class ModelCollectionQuery
     def initialize(search_phrase, scope = BikeModel)
@@ -19,7 +29,7 @@ module BikeMfg
         models_found = @scope.where{name =~ "%#{term}%"}
         models_found.each do |model|
           b = model.bike_brand
-          brands[b.id] ||= blank_h(b)
+          brands[b.id] ||= blank_brand(b)
           brands[b.id][:models] << model
         end
 
@@ -27,7 +37,7 @@ module BikeMfg
         
         brands_found.each do |b|
           if brands[b.id].nil?
-            brands[b.id] = blank_h(b)
+            brands[b.id] = blank_brand(b)
             b.models.each do |m|
               brands[b.id][:models] << m
             end
@@ -39,11 +49,16 @@ module BikeMfg
         nil
       end # if term.present?
     end
-        
-    private
 
-    def blank_h(obj)
-      {:name => obj.name, :models => []}
+    def blank_brand(brand, indirect=false)
+      Hash.new do |h,k|
+        case k.to_sym
+          when :name then brand.name
+          when :indirect then indirect
+          when :models then []
+        end
+      end
+      # {:name => obj.name, :models => []}
     end
     
   end #  ModelCollectionQuery
