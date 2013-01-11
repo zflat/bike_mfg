@@ -1,15 +1,5 @@
 require 'ostruct'
 
-class BrandHash < Hash
-
-  def initialize(brand, indirect=false)
-    super
-    self[:name] = brand.name
-    self[:indrect] = indirect
-  end
-
-end
-
 module BikeMfg
   class ModelCollectionQuery
     def initialize(search_phrase, scope = BikeModel)
@@ -53,7 +43,7 @@ module BikeMfg
     def self.blank_brand(brand, indirect=false)
       Hash.new do |h,k|
         case k.to_sym
-          when :name then brand.name
+          when :name then brand[:name]
           when :indirect then indirect
           when :models then []
         end
