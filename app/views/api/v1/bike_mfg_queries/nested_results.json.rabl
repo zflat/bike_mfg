@@ -4,6 +4,10 @@ node do |m|
  {:more => false}
 end
 
+node do |m|
+ {:q => term}
+end
+
 node(:results) do |m|
   if @results
     @results.map do |brand| 

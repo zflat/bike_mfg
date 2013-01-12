@@ -4,6 +4,7 @@ module BikeMfg
       
       def self.included(base)
         base.send :respond_to, :json
+        base.send :helper_method, :term
       end
       
       # Actions
@@ -27,7 +28,7 @@ module BikeMfg
       def term
         params[:q]
       end
-      
+
     end
   end
 end

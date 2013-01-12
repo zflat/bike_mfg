@@ -7,6 +7,10 @@ node do |m|
  {:more => false}
 end
 
+node do |m|
+ {:q => term}
+end
+
 node(:results) do
   if @results
     @results.map { |o| {:text => o.name, :id => o.id} }
