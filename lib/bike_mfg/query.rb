@@ -165,11 +165,17 @@ module BikeMfg
     end
     
     attr_reader :phrase
+
+    def self.read_val(obj, sym)
+      val = obj.send(sym) if obj.respond_to?(sym)
+      val ||= obj[sym] if obj.respond_to?('[]')
+    end
     
     def self.brand_h(brand, direct=true)
-      name = brand.name if brand.respond_to?(:name)
-      name ||= brand[:name] if brand.respond_to?('[]')
-      {:name => name, :models => [], :direct => direct}
+      name = read_val(brand,:name)
+      id = read_val(brand,:id)
+
+      {:name => name, :id=> id, :models => [], :direct => direct}
     end
     
     def brand_h(brand, direct=true)
