@@ -233,7 +233,10 @@ module BikeMfg
   class NameQuery
     include Query::PhraseTerms
 
-    def initialize(search_phrase, scope, inclusion)
+    def initialize(search_phrase, scope, inclusion, opts ={})
+      @constraints = {:id => :id}
+      @constraints = opts[:constraints] unless opts[:constraints].nil?
+
       @scope = scope
       @inclision = inclusion
       set_phrase_terms(search_phrase)
@@ -243,7 +246,9 @@ module BikeMfg
       return nil if phrase.blank?
       t = terms
       return @scope.joins{@inclusion}.
-        where{name.like_any t}.
+        where{(name.like_any t) &
+        (my{@constraints})
+      }.
         includes{@inclusion}
     end # find_each
 
