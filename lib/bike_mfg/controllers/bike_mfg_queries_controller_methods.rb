@@ -8,12 +8,12 @@ module BikeMfg
       
       # Actions
       def search_models
-        @results = BikeMfg::NameQuery.new(term, BikeModel).find_each
+        @results = BikeMfg::NameQuery.new(term, BikeModel, :bike_brand).find_each
         render :flat_results and return
       end
 
       def search_brands
-        @results = BikeMfg::NameQuery.new(term, BikeBrand).find_each
+        @results = BikeMfg::NameQuery.new(term, BikeBrand, :bike_models).find_each
         render :flat_results and return
       end
 
