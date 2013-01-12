@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'bike_mfg'
 
 class String
   def blank?
@@ -16,6 +17,7 @@ module BikeMfg
       
       before(:each) do
         @scope = double('scope', :where=>[])
+        @scope.stub(:joins=>[])
         @term = "test"
         @q = ModelCollectionQuery.new(@term, :models=>@scope, :brands=>@scope)
       end
