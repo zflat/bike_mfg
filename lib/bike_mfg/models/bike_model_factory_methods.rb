@@ -16,15 +16,11 @@ module BikeMfg
         @model
       end
 
-      def params
-        @params
-      end
-      
+      private
+
       def params_list
         [:model_id, :model_name, :brand_id, :brand_name]
       end
-
-      private
 
       # Build the model and brand based on input paramaters.
       #
@@ -54,48 +50,50 @@ module BikeMfg
       def build
         model = nil
         if true &&
-            !params.model_id? && !params.model_name &&
-            !params.brand_id && !params.brand_name
+            !@params.model_id? && !@params.model_name? &&
+            !@params.brand_id? && !@params.brand_name?
           # Case nullify current assignment
           model = nil
         elsif true &&
-            !params.model_id? && !params.model_name &&
-            !params.brand_id && params.brand_name
+            !@params.model_id? && !@params.model_name? &&
+            !@params.brand_id? && @params.brand_name?
           
           # Case unknown model for new/found brand
-        elsif true &&
-            !params.model_id? && !params.model_name &&
-            params.brand_id && !params.brand_name
-
-          # Case Unknown model for given brand
-          b = get_brand(params.brand_id)
+          b = build_brand(@params.brand_name)
           model = build_model(nil, b)
         elsif true &&
-            !params.model_id? && params.model_name &&
-            !params.brand_id && !params.brand_name
+            !@params.model_id? && !@params.model_name? &&
+            @params.brand_id? && !@params.brand_name?
+
+          # Case Unknown model for given brand
+          b = get_brand(@params.brand_id)
+          model = build_model(nil, b)
+        elsif true &&
+            !@params.model_id? && @params.model_name? &&
+            !@params.brand_id? && !@params.brand_name?
 
           # Case new/found model with unknown brand
-          model = build_model(params.model_name, nil)
+          model = build_model(@params.model_name, nil)
         elsif true &&
-            params.model_id? && !params.model_name &&
-            params.brand_id && !params.brand_name
+            @params.model_id? && !@params.model_name? &&
+            @params.brand_id? && !@params.brand_name?
 
           # Case new/found model with new/found brand
-          b = build_brand(params.brand_name)
-          model = build_model(params.model_name, b)
+          b = build_brand(@params.brand_name)
+          model = build_model(@params.model_name, b)
         elsif true &&
-            !params.model_id? && params.model_name &&
-            params.brand_id && !params.brand_name
+            !@params.model_id? && @params.model_name? &&
+            @params.brand_id? && !@params.brand_name?
 
           # Case new/found model with given brand
-          b = get_brand(params.brand_id)
-          model = build_model(params.model_name, b)
+          b = get_brand(@params.brand_id)
+          model = build_model(@params.model_name, b)
         elsif true &&
-            params.model_id? && !params.model_name &&
-            !params.brand_id && !params.brand_name
+            @params.model_id? && !@params.model_name? &&
+            !@params.brand_id? && !@params.brand_name?
 
           # Case given model
-          model = get_model(params.model_id)
+          model = get_model(@params.model_id)
         else
           # Exception due to ambiguity
           raise Exception.new("Ambiguous build parameters")
