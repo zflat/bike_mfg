@@ -82,7 +82,6 @@ module BikeMfg
             :brand_scope=>@brand_scope,
             :model_scope=>@model_scope
           }
-
           factory = BikeModelFactory.new(args)
           expect(factory.model.name).to be_nil
           expect(factory.model.brand_id).to eq brand.id
@@ -96,12 +95,75 @@ module BikeMfg
             :brand_scope=>@brand_scope,
             :model_scope=>@model_scope
           }
-
           factory = BikeModelFactory.new(args)
           expect(factory.model.name).to be_nil
           expect(factory.model.brand_id).to_not be_nil
         end
       end
+
+      context "A valid brand_id is given, but no model name" do
+        it "should have an unknown model for the given brand" do
+          brand = @brand_data[2]
+          args = {
+            :brand_id => brand.id,
+            :brand_scope=>@brand_scope,
+            :model_scope=>@model_scope
+          }
+          factory = BikeModelFactory.new(args)
+          expect(factory.model.name).to be_nil
+          expect(factory.model.brand_id).to eq brand.id
+        end
+      end
+
+      context "A model name for an existing model is given" do
+        it "should have a found model with the model's brand" do
+          model = @model_data[2]
+          args = {
+            :model_name => model.name,
+            :brand_scope=>@brand_scope,
+            :model_scope=>@model_scope
+          }
+          factory = BikeModelFactory.new(args)
+          expect(factory.model.name).to eq model.name
+          expect(factory.model.id).to eq model.id
+          expect(factory.model.brand_id).to eq model.brand_id
+        end
+      end
+      context "A model name for a non-existing model is given" do
+        it "should have a new model with unknown brand" do
+          model = @model_data[2]
+          args = {
+            :model_name => model.name+'new',
+            :brand_scope=>@brand_scope,
+            :model_scope=>@model_scope
+          }
+          factory = BikeModelFactory.new(args)
+          expect(factory.model.name).to eq args[:model_name]
+          expect(factory.model.id).to eq 0
+          expect(factory.model.brand_id).to be_nil
+        end
+      end
+
+      context "A model name for an existing model and a brand name is given" do
+        it "should have a found model" do
+          model = @model_data[2]
+          args = {
+            :model_name => model.name,
+            :brand_name => 'test',
+            :brand_scope=>@brand_scope,
+            :model_scope=>@model_scope
+          }
+          factory = BikeModelFactory.new(args)
+          expect(factory.model.name).to eq model.name
+          expect(factory.model.id).to eq model.id
+          expect(factory.model.brand_id).to eq model.brand_id
+        end
+      end
+
+      
+
+      # TODO more test cases, continuing on use case 0101
+
 
       context "A model_id for existing model is given" do
         it "should have model with the same id" do

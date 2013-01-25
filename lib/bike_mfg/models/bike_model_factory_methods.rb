@@ -5,7 +5,6 @@ module BikeMfg
     module BikeModelFactoryMethods
       
       #instance methods
-      #def initialize(model_scope=BikeModel, brand_scope=BikeBrand, arg_prefix='', paramaters={})
       def initialize(args = {})
         @model_scope = args[:model_scope] || BikeModel
         @brand_scope = args[:brand_scope] || BikeBrand
@@ -16,9 +15,7 @@ module BikeMfg
         @model = build
       end
 
-      def model
-        @model
-      end
+      attr_reader :model
 
       private
 
@@ -39,9 +36,9 @@ module BikeMfg
       #     0    |     0      |     0    |     1      || Unknown model for new/found brand
       #     0    |     0      |     1    |     0      || Unknown model for given brand
       #     0    |     0      |     1    |     1      || Exception: ambiguity
-      #     0    |     1      |     0    |     0      || New/found model with unknown brand
-      #     0    |     1      |     0    |     1      || New/found model with new/found brand
-      #     0    |     1      |     1    |     0      || New/found model with given brand
+      #     0    |     1      |     0    |     0      || New/found model w/ unknown/assigned brand
+      #     0    |     1      |     0    |     1      || New/found model w/ new/found/assigned brand
+      #     0    |     1      |     1    |     0      || New/found model w/ given brand
       #     0    |     1      |     1    |     1      || Exception: ambiguity
       #     1    |     0      |     0    |     0      || Given model
       #     1    |     0      |     0    |     1      || Exception: ambiguity
@@ -79,10 +76,10 @@ module BikeMfg
           # Case new/found model with unknown brand
           model = build_model(@params.model_name, nil)
         elsif true &&
-            @params.model_id? && !@params.model_name? &&
-            @params.brand_id? && !@params.brand_name?
+            !@params.model_id? && @params.model_name? &&
+            !@params.brand_id? && @params.brand_name?
 
-          # Case new/found model with new/found brand
+          # Case new/found model w/ new/found/assigned brand
           b = build_brand(@params.brand_name)
           model = build_model(@params.model_name, b)
         elsif true &&
@@ -116,8 +113,9 @@ module BikeMfg
       end
 
       def build_model(name, brand)
+        brand_id = brand.id if brand
         params = {:name => name, 
-          (@param_prefix+'brand_id').to_sym => brand.id}
+          (@param_prefix+'brand_id').to_sym => brand_id}
         model = @model_scope.where(params)
         model ||= @model_scope.new(params)
       end
