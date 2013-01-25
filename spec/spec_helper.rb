@@ -4,6 +4,29 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'rspec'
 require 'bike_mfg'
 
+class String
+  def blank?
+    strip.length == 0
+  end
+  def present?
+    !blank?
+  end
+end
+
+module ChainableScopeMethods
+  [:where, :joins, :includes, :group].each do |method_name|
+    define_method(method_name){self}
+  end
+  def new(params={})
+    OpenStruct.new({:id=>0}.merge params)
+  end
+end
+
+class ChainableScope
+  include ChainableScopeMethods
+  def all; [] end
+end
+
 # Use i18n-spec if locales are added to the gem
 # require 'i18n-spec'
 

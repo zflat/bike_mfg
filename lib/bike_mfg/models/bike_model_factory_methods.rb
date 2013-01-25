@@ -5,8 +5,12 @@ module BikeMfg
     module BikeModelFactoryMethods
       
       #instance methods
-      def initialize(paramaters={})
-        @params = OpenStruct.new paramaters
+      #def initialize(model_scope=BikeModel, brand_scope=BikeBrand, arg_prefix='', paramaters={})
+      def initialize(args = {})
+        @model_scope = args[:model_scope] || BikeModel
+        @brand_scope = args[:brand_scope] || BikeBrand
+        parse_param_prefix(args[:param_prefix])
+        @params = parse_params(args)
         set_flags(params_list)
 
         @model = build
@@ -102,17 +106,47 @@ module BikeMfg
         return model
       end
 
-      def get_brand(id)
-      end
 
       def get_model(id)
+        return @model_scope.where(:id => id)
+      end
+
+      def get_brand(id)
+        return @brand_scope.where(:id=>id)
       end
 
       def build_model(name, brand)
+        params = {:name => name, 
+          (@param_prefix+'brand_id').to_sym => brand.id}
+        model = @model_scope.where(params)
+        model ||= @model_scope.new(params)
       end
 
       def build_brand(name)
+        params = {:name=>name}
+        brand = @brand_scope.where(params)
+        brand ||= @brand_scope.new(params)
       end
+
+      def parse_param_prefix(arg)
+        @param_prefix = arg
+        @param_prefix += '_' if @param_prefix
+        @param_prefix ||= ''
+      end
+
+      def parse_params(h)
+        params_h = {}
+        prefix_pattern = Regexp.new('\A'+@param_prefix)
+        h.each  do |k,v| 
+          # get the parameter key without the prefix
+          key = k.to_s.gsub(prefix_pattern, '').to_sym
+          if params_list.include?(key)
+            params_h[key] = v
+          end
+        end
+        OpenStruct.new params_h
+      end
+
       
       def set_flags(list)
         list.each do |p|

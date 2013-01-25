@@ -1,24 +1,8 @@
 require 'spec_helper'
 require 'bike_mfg'
 
-class String
-  def blank?
-    strip.length == 0
-  end
-  def present?
-    !blank?
-  end
-end
-
 module BikeMfg
   
-  class ChainableScope
-    [:where, :joins, :includes, :group].each do |method_name|
-      define_method(method_name){self}
-    end
-    def all; [] end
-  end
-
   describe ModelCollectionQuery do
 
     describe "a stubbed scope" do
