@@ -129,7 +129,7 @@ module BikeMfg
     end
     
     def indirect_models
-      @indirect_models ||= Query::related_models(indirect_brands())
+      @indirect_models ||= Query::related_models(indirect_brands(), @scope_models)
       @indirect_models
     end
     

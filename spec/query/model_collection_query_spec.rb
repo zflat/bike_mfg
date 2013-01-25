@@ -11,13 +11,21 @@ class String
 end
 
 module BikeMfg
+  
+  class ChainableScope
+    [:where, :joins, :includes, :group].each do |method_name|
+      define_method(method_name){self}
+    end
+    def all; [] end
+  end
+
   describe ModelCollectionQuery do
 
     describe "a stubbed scope" do
-      
+
       before(:each) do
-        @scope = double('scope', :where=>[])
-        @scope.stub(:joins=>[])
+        # @scope = double('scope', :where=>[])
+        @scope = ChainableScope.new 
         @term = "test"
         @q = ModelCollectionQuery.new(@term, :models=>@scope, :brands=>@scope)
       end
