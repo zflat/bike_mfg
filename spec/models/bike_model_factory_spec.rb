@@ -21,21 +21,30 @@ class ModelFactoryAsserter
     @brand = @model.brand if @model
   end
 
+  #
+  # @params Array given_params used to generate the factory params
+  # @params (:sym, [:sym, :sym]) expected as model_case or [model_case, brand_case] 
   def run(given_params, expected)
     params = generate_params(given_params)
     params.merge!({:param_prefix => :bike})
-    factory = BikeModelFactory.new(params)
-    expected_model = generate_expected_model(expected)
-    @base.expect(factory.model).to @base.eq expected_model
-  end
 
-  # map a symbol argument to a model object
-  def generate_expected_model(sym)
-    case sym
-      when :found then @model
-      when :new then BikeModel.all.last
-      when nil then nil
+    model_case = expected if expected.respond_to?(:to_sym)
+    model_case = expected[0] if expected.respond_to?('[]')
+    
+    if model_case == :found
+      factory = BikeModelFactory.new(params)
+      @base.expect(factory.model).to @base.eq @model
+    elsif model_case == :new
+      factory = nil
+      @base.expect{factory = BikeModelFactory.new(params)}.
+        to @base.change{BikeModel.count}.by(1)      
+
+      brand_case = expected[1]
+      if brand_case == nil
+        @base.expect(factory.model.brand).to @base.be_nil
+      end
     end
+
   end
 
   private
@@ -51,24 +60,26 @@ class ModelFactoryAsserter
       :brand_name => generate_name(@brand, given[3])}
   end
 
+  # @params (nil, :found, :missing) sym id param case
   def generate_id(scope, sym)
     return nil if scope.nil?
-    if sym == :id
-      scope.id
-    else
-      nil
-    end
+    id = case sym
+         when :found then scope.id
+         when :missing then 0
+         else nil
+         end
+    return id
   end
 
+  # @params (nil, :found, :new) sym name param case
   def generate_name(scope, sym)
     return nil if scope.nil?
-    if sym == :name
-      scope.name
-    elsif sym == :new_name
-      scope.name.to_s + " new text"
-    else
-      nil
-    end
+    id = case sym
+           when :found then scope.name
+           when :new then scope.name.to_s + " new"
+           else nil
+         end
+    return id
   end
 
 end # class ModelFactoryAsserter
@@ -82,13 +93,13 @@ describe 'BikeModelFactory#model' do
   it should do @a.run(nil , nil) end
   
   should = "should be found"
-  it should do @a.run([:id, 0, 0, 0],:found) end
-  it should do @a.run([0, :name, 0, :name],:found) end
-  it should do @a.run([0, :name, :id, 0],:found) end
+  it should do @a.run([:found, 0, 0, 0],:found) end
+  it should do @a.run([0, :found, 0, :found],:found) end
+  it should do @a.run([0, :found, :found, 0],:found) end
 
   should = "should be new with nil brand"
-  it should do @a.run([0, :new_name, 0, 0], :new) end
-  it should do @a.run([0, :new_name, 0, :new_name], :new) end
+  it should do @a.run([0, :new, 0, 0], [:new, nil]) end
+  it should do @a.run([0, :new, 0, :new], [:new, nil]) end
 
   it "should be new with found brand"
 

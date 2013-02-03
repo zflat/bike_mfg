@@ -13,7 +13,8 @@ module BikeMfg
         parse_param_prefix(args[:param_prefix])
         @params = parse_params(args)
         set_flags(params_list)
-
+        validate_params
+        
         @model = build
       end
 
@@ -80,13 +81,13 @@ module BikeMfg
       def get_model(arg)
         id = arg.to_i if arg.respond_to?(:to_i)
         id ||= arg.id if arg.respond_to?(:id)
-        id ||= arg.model_id if arg.respond_to?(:model_id)
+        id ||= arg.model_id if arg.model_id?
 
         # Find by model_id
         m = @model_scope.where(:id => id).first if id
 
         name = arg.name if arg.respond_to?(:name)
-        name = arg.model_name if arg.respond_to?(:model_name)
+        name = arg.model_name if arg.model_name?
         
         if m.nil? && name
           brand_id = arg.brand_id
@@ -115,14 +116,14 @@ module BikeMfg
       def get_brand(arg)
         # get brand by id
         id = arg if arg.respond_to?(:to_i)
-        id ||= arg.brand_id if arg.respond_to?(:brand_id)
+        id ||= arg.brand_id if arg.brand_id?
 
         b = @brand_scope.where{ {:id => id} }.first if id
 
         if b.nil?
           # Try to get the brand by name
           name = arg.name if arg.respond_to?(:name)
-          name = arg.brand_name if arg.respond_to?(:brand_name)
+          name = arg.brand_name if arg.brand_name?
           
           b = @brand_scope.where{ {:name => name} }.first if name
         end
@@ -179,6 +180,21 @@ module BikeMfg
           @params.send("#{p}?=", present)
         end
       end
+
+      def validate_params()
+        return nil if @params.nil?
+        
+        if @params.model_id? &&
+            (@params.model_name? ||
+             @params.brand_id? ||
+             @params.brand_name?)
+          raise Exception.new("Ambiguous parameters")
+        end
+
+        if @params.brand_id? && @params.brand_name?
+          raise Exception.new("Ambiguous parameters")
+        end
+      end # validate_params
       
     end # module BikeModelFactoryMethods
   end # module Models
