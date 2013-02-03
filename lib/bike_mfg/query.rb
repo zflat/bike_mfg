@@ -245,7 +245,7 @@ module BikeMfg
     def find(&block)
       return nil if phrase.blank?
       return @scope.joins{@inclusion}.
-        where{(name.eq phrase) & 
+        where{(name.eq my{phrase}) & 
         (my{@constraints})
       }.
         includes(@inclusion).first

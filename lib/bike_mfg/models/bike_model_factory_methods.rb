@@ -1,5 +1,7 @@
 require 'ostruct'
 
+require 'bike_mfg/query'
+
 module BikeMfg
   module Models
     module BikeModelFactoryMethods
@@ -82,18 +84,22 @@ module BikeMfg
 
         # Find by model_id
         m = @model_scope.where(:id => id).first if id
-        
-        if m.nil? && arg.respond_to?(:name)
+
+        name = arg.name if arg.respond_to?(:name)
+        name = arg.model_name if arg.respond_to?(:model_name)
+
+        if m.nil? && name
           brand_id = arg.brand_id
           brand_name = arg.brand_name
-          name = arg.name
           
           # Constrain by brand info, with preference for brand_id
           brand_constraint = {prefixed(:brand_id) => brand_id} unless brand_id.nil?
-          brand_constraint ||= {prefixed(:brand_name) => brand_name} unless brand_name.nail?
-          
+          brand_constraint ||= {prefixed(:brand_name) => brand_name} unless brand_name.nil?
+
+          puts brand_constraint
+
           # Find by name and brand constraint
-          m =NameQuery.new(name, @model_scope, @brand_scope, :constraints => brand_constraint).find
+          m = NameQuery.new(name, @model_scope, @brand_scope, :constraints => brand_constraint).find
         end
 
         m
@@ -140,7 +146,7 @@ module BikeMfg
 
 
       def parse_param_prefix(arg)
-        @param_prefix = arg
+        @param_prefix = arg.to_s
         @param_prefix += '_' if @param_prefix
         @param_prefix ||= ''
       end
@@ -166,7 +172,7 @@ module BikeMfg
       def set_flags(list)
         list.each do |p|
           val = @params.send("#{p}")
-          present = !val.nil? && val.strip != ''
+          present = !val.nil? && val.to_s.strip != ''
           @params.send("#{p}?=", present)
         end
       end
