@@ -87,19 +87,22 @@ module BikeMfg
 
         name = arg.name if arg.respond_to?(:name)
         name = arg.model_name if arg.respond_to?(:model_name)
-
+        
         if m.nil? && name
           brand_id = arg.brand_id
           brand_name = arg.brand_name
+
+          brand_inclusion = prefixed(:brand)
           
           # Constrain by brand info, with preference for brand_id
-          brand_constraint = {prefixed(:brand_id) => brand_id} unless brand_id.nil?
-          brand_constraint ||= {prefixed(:brand_name) => brand_name} unless brand_name.nil?
-
-          puts brand_constraint
-
+          
+          brand_constraint =  {:id => brand_id}  unless brand_id.nil?
+          brand_constraint ||= {:name => brand_name} unless brand_name.nil?
+          brand_constraint ||= {:id => :id}
+          constraint = {brand_inclusion => brand_constraint}
+          
           # Find by name and brand constraint
-          m = NameQuery.new(name, @model_scope, @brand_scope, :constraints => brand_constraint).find
+          m = NameQuery.new(name, @model_scope, brand_inclusion, :constraints => constraint).find
         end
 
         m

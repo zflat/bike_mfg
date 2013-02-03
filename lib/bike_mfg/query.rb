@@ -238,12 +238,13 @@ module BikeMfg
       @constraints = opts[:constraints] unless opts[:constraints].nil?
 
       @scope = scope
-      @inclision = inclusion
+      @inclusion = inclusion
       set_phrase_terms(search_phrase)
     end
 
     def find(&block)
       return nil if phrase.blank?
+      
       return @scope.joins{@inclusion}.
         where{(name.eq my{phrase}) & 
         (my{@constraints})
