@@ -49,82 +49,95 @@ module BikeMfg
       #     1    |     1      |     1    |     0      || Exception: ambiguity
       #     1    |     1      |     1    |     1      || Exception: ambiguity
       def build
-        model = nil
-        if true &&
-            !@params.model_id? && !@params.model_name? &&
-            !@params.brand_id? && !@params.brand_name?
-          # Case nullify current assignment
-          model = nil
-        elsif true &&
-            !@params.model_id? && !@params.model_name? &&
-            !@params.brand_id? && @params.brand_name?
+
+        # Try to find the model given the user information
+        model = get_model(@params)
+
+        # Create the model if none was found
+        if model.nil?
           
-          # Case unknown model for new/found brand
-          b = build_brand(@params.brand_name)
-          model = build_model(nil, b)
-        elsif true &&
-            !@params.model_id? && !@params.model_name? &&
-            @params.brand_id? && !@params.brand_name?
+          # Find or build the brand
+          brand = get_brand(@params)
+          brand ||= build_brand(@params.brand_name) if @params.brand_name
 
-          # Case Unknown model for given brand
-          b = get_brand(@params.brand_id)
-          model = build_model(nil, b)
-        elsif true &&
-            !@params.model_id? && @params.model_name? &&
-            !@params.brand_id? && !@params.brand_name?
-
-          # Case new/found model with unknown brand
-          model = build_model(@params.model_name, nil)
-        elsif true &&
-            !@params.model_id? && @params.model_name? &&
-            !@params.brand_id? && @params.brand_name?
-
-          # Case new/found model w/ new/found/assigned brand
-          b = build_brand(@params.brand_name)
-          model = build_model(@params.model_name, b)
-        elsif true &&
-            !@params.model_id? && @params.model_name? &&
-            @params.brand_id? && !@params.brand_name?
-
-          # Case new/found model with given brand
-          b = get_brand(@params.brand_id)
-          model = build_model(@params.model_name, b)
-        elsif true &&
-            @params.model_id? && !@params.model_name? &&
-            !@params.brand_id? && !@params.brand_name?
-
-          # Case given model
-          model = get_model(@params.model_id)
-        else
-          # Exception due to ambiguity
-          raise Exception.new("Ambiguous build parameters")
+          # build the model if enough information is present
+          model = build_model(@params.model_name, brand) if (@params.model_name? && !brand.nil?)
         end
 
-        return model
+        model
       end
 
 
-      def get_model(id)
-        return @model_scope.where(:id => id)
-      end
+      # A model is uniquely identified by one of:
+      # * id
+      # * exact match of model name and brand name
+      # * exact match of model name and brand id
+      # 
+      # @param (Fixnum, #to_i, #id, (#brand_id, #name), (#brand_name, #name) arg model identifier
+      # 
+      def get_model(arg)
+        id = arg.to_i if arg.respond_to?(:to_i)
+        id ||= arg.id if arg.respond_to?(:id)
+        id ||= arg.model_id if arg.respond_to?(:model_id)
 
-      def get_brand(id)
-        return @brand_scope.where(:id=>id)
+        # Find by model_id
+        m = @model_scope.where(:id => id).first if id
+        
+        if m.nil? && arg.respond_to?(:name)
+          brand_id = arg.brand_id
+          brand_name = arg.brand_name
+          name = arg.name
+          
+          # Constrain by brand info, with preference for brand_id
+          brand_constraint = {prefixed(:brand_id) => brand_id} unless brand_id.nil?
+          brand_constraint ||= {prefixed(:brand_name) => brand_name} unless brand_name.nail?
+          
+          # Find by name and brand constraint
+          m =NameQuery.new(name, @model_scope, @brand_scope, :constraints => brand_constraint).find
+        end
+
+        m
+      end
+      
+      # A brand is found by id or by an exact match on name.
+      #
+      # @param Fixnum (#to_i, #brand_id, #name, #brand_name) id
+      # 
+      def get_brand(arg)
+        # get brand by id
+        id = arg if arg.respond_to?(:to_i)
+        id ||= arg.brand_id if arg.respond_to?(:brand_id)
+
+        b = @brand_scope.where{ {:id => id} }.first if id
+
+        if b.nil?
+          # Try to get the brand by name
+          name = arg.name if arg.respond_to?(:name)
+          name = arg.brand_name if arg.respond_to?(:brand_name)
+          
+          b = @brand_scope.where{ {:name => name} }.first if name
+        end
+
+        b
       end
 
       def build_model(name, brand)
         brand_id = brand.id if brand
-        params = {:name => name, 
-          (@param_prefix+'brand_id').to_sym => brand_id}
-        model = @model_scope.where(params)
-        model ||= @model_scope.new(params)
+        if !name.nil? && !brand_id.nil?
+          params = {:name => name, prefixed(:brand_id) => brand_id}
+        end
+        model = @model_scope.new(params) if params
+        model
       end
 
       def build_brand(name)
-        params = {:name=>name}
-        brand = @brand_scope.where(params)
-        brand ||= @brand_scope.new(params)
+        params = {:name=>name} unless name.blank?
+        brand = @brand_scope.new(params) unless params.nil?
+        brand
       end
+
+
+
 
       def parse_param_prefix(arg)
         @param_prefix = arg
@@ -132,6 +145,10 @@ module BikeMfg
         @param_prefix ||= ''
       end
 
+      def prefixed(val)
+        (@param_prefix.to_s+val.to_s).to_sym
+      end
+      
       def parse_params(h)
         params_h = {}
         prefix_pattern = Regexp.new('\A'+@param_prefix)

@@ -1,8 +1,7 @@
+require 'bike_mfg/db/migrate/bike_brand_transformations'
 class CreateBikeBrands < ActiveRecord::Migration
+  include BikeMfg::Db::Migrate::BikeBrandTransformations
   def change
-    create_table :bike_brands do |t|
-      t.string "name"
-      #t.timestamps
-    end
+    create_table_transformation
   end
 end

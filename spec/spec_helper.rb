@@ -1,8 +1,9 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib/bike_mfg'))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'app/models'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'rspec'
-require 'bike_mfg'
+require 'machinist/active_record'
 
 class String
   def blank?
@@ -35,5 +36,7 @@ end
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
 RSpec.configure do |config|
-  
+  config.before(:suite) do
+    Models.make
+  end
 end

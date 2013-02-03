@@ -242,6 +242,15 @@ module BikeMfg
       set_phrase_terms(search_phrase)
     end
 
+    def find(&block)
+      return nil if phrase.blank?
+      return @scope.joins{@inclusion}.
+        where{(name.eq phrase) & 
+        (my{@constraints})
+      }.
+        includes(@inclusion).first
+    end
+    
     def find_each(&block)
       return nil if phrase.blank?
       t = terms

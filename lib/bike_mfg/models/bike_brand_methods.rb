@@ -5,6 +5,7 @@ module BikeMfg
         base.send :has_many, :bike_models
         base.send :attr_accessible, :name
         base.send :validates_presence_of, :name
+        base.send :validates_uniqueness_of, :name
       end # self.included
 
       # instance methods

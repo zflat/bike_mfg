@@ -144,12 +144,13 @@ module BikeMfg
         end
       end
 
-      context "A model name for an existing model and a brand name is given" do
+      
+      describe "Given a name for existing model" do
         it "should have a found model" do
           model = @model_data[2]
           args = {
             :model_name => model.name,
-            :brand_name => 'test',
+            :brand_name => model.brand.name,
             :brand_scope=>@brand_scope,
             :model_scope=>@model_scope
           }
@@ -159,9 +160,29 @@ module BikeMfg
           expect(factory.model.brand_id).to eq model.brand_id
         end
       end
+      
+      describe "given a name for non-existing model and name for existing brand" do
+        it "should not find model a model" do
+          model = @model_data[2]
+          args = {
+            :model_name => model.name,
+            :brand_name => model.brand.name+"different",
+            :brand_scope=>@brand_scope,
+            :model_scope=>@model_scope
+          } 
+          factory = BikeModelFactory.new(args)
+          expect(factory.model.name).to eq model.name
+          expect(factory.model.id).to eq model.id
+          expect(factory.model.brand_id).to_not eq model.brand_id
+        end  
+
+      end
+
+      context "A model name for an existing model and a new brand name is given"
+
+      context "A new model name for an existing brand is given" 
 
       
-
       # TODO more test cases, continuing on use case 0101
 
 
