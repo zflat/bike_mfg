@@ -11,7 +11,6 @@ class Models
 
     10.times do
       bike_model = BikeModel.make!
-#      bike_brand = BikeBrand.make!
     end
 
   end # self.make
