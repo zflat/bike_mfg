@@ -4,7 +4,6 @@ module BikeMfg
       def self.included(base)
         base.send :belongs_to, :bike_brand
         base.send :attr_accessible, :name, :bike_brand_id
-        base.send :validates_presence_of, :name
         base.send :validates_uniqueness_of, :name, :scope => :bike_brand_id
       end # self.included
 

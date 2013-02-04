@@ -15,9 +15,9 @@ end
 
 class ModelFactoryAsserter
 
-  def initialize(base)
+  def initialize(base, model=nil)
     @base = base
-    @model = BikeModel.all.first
+    @model = model || BikeModel.all.first
     @brand = @model.brand if @model
   end
 
@@ -28,18 +28,31 @@ class ModelFactoryAsserter
     params = generate_params(given_params)
     params.merge!({:param_prefix => :bike})
 
-    model_case = expected if expected.respond_to?(:to_sym)
-    model_case = expected[0] if expected.respond_to?('[]')
-    
+    brand_case = 0 # initialize to not nil
+    model_case = 0 # initialize to not nil
+
+    if expected.respond_to?(:to_sym)
+      model_case = expected 
+    elsif expected.respond_to?('to_a')
+      model_case = expected.to_a[0] 
+      brand_case = expected.to_a[1]
+    end
+
     if model_case == :found
       factory = BikeModelFactory.new(params)
       @base.expect(factory.model).to_not @base.be_nil
       @base.expect(factory.model).to @base.eq @model
+
+      if brand_case == :found
+        @base.expect(factory.model.brand).to @base.eq @brand
+      elsif brand_case.nil?
+        @base.expect(factory.model.brand).to @base.be_nil
+      end
+
     elsif model_case == :new
       factory = BikeModelFactory.new(params)
       @base.expect(factory.model).to_not @base.be_nil
       
-      brand_case = expected[1]
       if brand_case == :found
         @base.expect{ factory.model.save }.
           to @base.change{BikeModel.count + BikeBrand.count}.by(1)
@@ -56,8 +69,15 @@ class ModelFactoryAsserter
     elsif model_case.nil?
       factory = BikeModelFactory.new(params)
       @base.expect(factory.model).to @base.be_nil      
+    elsif model_case == :exception
+      e_thrown = false
+      begin
+        factory = BikeModelFactory.new(params)
+      rescue Exception
+        e_thrown = true
+      end
+      @base.expect(e_thrown).to @base.be_true
     end
-
   end
 
   private
@@ -88,7 +108,7 @@ class ModelFactoryAsserter
   def generate_name(scope, sym)
     return nil if scope.nil?
     id = case sym
-           when :found then scope.name
+         when :found then scope.name
          when :new then scope.name.to_s + " new#{scope.class.count+1}"
            else nil
          end
@@ -99,19 +119,33 @@ end # class ModelFactoryAsserter
 
 describe 'BikeModelFactory#model' do
   before :all do
-    @a = ModelFactoryAsserter.new(self)
+    model_with_brand = BikeModel.where{ bike_brand_id != nil}.first
+    @a = ModelFactoryAsserter.new(self, model_with_brand)
+
+    model_without_brand = BikeModel.where{bike_brand_id == nil}.first
+    @b = ModelFactoryAsserter.new(self, model_without_brand)
+    
+    model_without_name = BikeModel.where{ name == '' }.first
+    @c = ModelFactoryAsserter.new(self, model_without_name)
   end
 
   should = "should be nil"
   it should do @a.run(nil , nil) end
   it should do @a.run([0,0,0,0] , nil) end
-  it should do @a.run([0,:found,0,0] , nil) end
+  it should do @a.run([:missing,0,0,0] , nil) end
+  it should do @a.run([0,0,:found,0] , nil) end
+  it should do @a.run([0,0,0,:found] , nil) end
   
   should = "should be found"
   it should do @a.run([:found, 0, 0, 0],:found) end
   it should do @a.run([0, :found, 0, :found],:found) end
-  it should do @a.run([0, :found, :found, 0],:found) end
-
+  it should do @a.run([0, :found, :found, 0],[:found, :found]) end
+  it should do @b.run([0, :found, 0, 0], [:found, nil]) end
+  it should do @c.run([0, :found, :found, 0], :found) end
+  it should do @c.run([0, :found, 0, :found], :found) end
+  it should do @c.run([0, 0, :found, 0], [:found, :found]) end
+  it should do @c.run([0, 0, 0, :found], [:found, :found]) end
+  
   should = "should be new with nil brand"
   it should do @a.run([0, :new, 0, 0], [:new, nil]) end
 
@@ -121,5 +155,17 @@ describe 'BikeModelFactory#model' do
 
   should = "should be new with new brand"
   it should do @a.run([0, :new, 0, :new], [:new, :new]) end
+  
+  should = "should raise exception"
+  it should do @a.run([0, 0, :found, :found], :exception) end
+  it should do @a.run([0, :found, :found, :found], :exception) end
+
+  it should do @a.run([:found, 0, 0, :found], :exception) end
+  it should do @a.run([:found, 0, :found, 0], :exception) end
+  it should do @a.run([:found, 0, :found, :found], :exception) end
+  it should do @a.run([:found, :found, 0, 0], :exception) end
+  it should do @a.run([:found, :found, 0, :found], :exception) end
+  it should do @a.run([:found, :found, :found, 0], :exception) end
+  it should do @a.run([:found, :found, :found, :found], :exception) end
 
 end # describe BikeModelFactory#model

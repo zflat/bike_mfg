@@ -39,8 +39,8 @@ module BikeMfg
       #     0    |     0      |     0    |     1      || Unknown model for new/found brand
       #     0    |     0      |     1    |     0      || Unknown model for given brand
       #     0    |     0      |     1    |     1      || Exception: ambiguity
-      #     0    |     1      |     0    |     0      || New/found model w/ unknown/assigned brand
-      #     0    |     1      |     0    |     1      || New/found model w/ new/found/assigned brand
+      #     0    |     1      |     0    |     0      || New/found model w/ unknown brand
+      #     0    |     1      |     0    |     1      || New/found model w/ new/assigned brand
       #     0    |     1      |     1    |     0      || New/found model w/ given brand
       #     0    |     1      |     1    |     1      || Exception: ambiguity
       #     1    |     0      |     0    |     0      || Given model
@@ -88,7 +88,8 @@ module BikeMfg
 
         name = arg.name if arg.respond_to?(:name)
         name = arg.model_name if arg.model_name?
-        
+        name ||= '' if !arg.model_id?
+
         if m.nil? && name
           brand_id = arg.brand_id
           brand_name = arg.brand_name
@@ -99,12 +100,12 @@ module BikeMfg
           
           brand_constraint =  {:id => brand_id}  unless brand_id.nil?
           brand_constraint ||= {:name => brand_name} unless brand_name.nil?
-          
-          if brand_constraint
-            constraint = {brand_inclusion => brand_constraint}
-            # Find by name and brand constraint
-            m = NameQuery.new(name, @model_scope, brand_inclusion, :constraints => constraint).find
-          end
+          constraint = {brand_inclusion => brand_constraint} if brand_constraint
+          constraint ||= {prefixed(:brand_id) => nil}
+
+          # Find by name and brand constraint
+          m = NameQuery.new(name, @model_scope, brand_inclusion, :constraints => constraint).find
+
         end
 
         m

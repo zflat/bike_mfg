@@ -12,7 +12,8 @@ module BikeMfg
       private
       
       def set_phrase_terms(phrase)
-        @phrase = phrase.strip unless phrase.blank?
+        @phrase = phrase
+        @phrase = @phrase.strip unless @phrase.blank?
         if @terms.nil? && @phrase
           @terms ||= 
             "%#{@phrase.gsub('%', '/%')}%".
@@ -243,10 +244,10 @@ module BikeMfg
     end
 
     def find(&block)
-      return nil if phrase.blank?
+      # return nil if phrase.blank?
       
       return @scope.joins{@inclusion}.
-        where{(name.eq my{phrase}) & 
+        where{(name == my{phrase}) & 
         (my{@constraints})
       }.
         includes(@inclusion).first
