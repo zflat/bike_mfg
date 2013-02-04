@@ -61,10 +61,11 @@ module BikeMfg
           
           # Find or build the brand
           brand = get_brand(@params)
-          brand ||= build_brand(@params.brand_name) if @params.brand_name
+          brand ||= build_brand(@params.brand_name) if @params.brand_name?
 
           # build the model if enough information is present
-          model = build_model(@params.model_name, brand) if (@params.model_name? && !brand.nil?)
+          model = build_model(@params.model_name, brand) if @params.model_name?
+          puts model.brand
         end
 
         model
@@ -132,11 +133,16 @@ module BikeMfg
       end
 
       def build_model(name, brand)
-        brand_id = brand.id if brand
-        if !name.nil? && !brand_id.nil?
-          params = {:name => name, prefixed(:brand_id) => brand_id}
+        model = nil
+
+        if !name.nil?
+          params = {:name => name}
+          model = @model_scope.new(params)
+
+          # assign the brand
+          model.send(prefixed(:brand=), brand) if model          
         end
-        model = @model_scope.new(params) if params
+
         model
       end
 
@@ -145,8 +151,6 @@ module BikeMfg
         brand = @brand_scope.new(params) unless params.nil?
         brand
       end
-
-
 
 
       def parse_param_prefix(arg)

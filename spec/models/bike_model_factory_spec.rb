@@ -35,12 +35,21 @@ class ModelFactoryAsserter
       factory = BikeModelFactory.new(params)
       @base.expect(factory.model).to @base.eq @model
     elsif model_case == :new
-      factory = nil
-      @base.expect{factory = BikeModelFactory.new(params)}.
-        to @base.change{BikeModel.count}.by(1)      
-
+      factory = BikeModelFactory.new(params)
+      @base.expect(factory.model).to_not @base.be_nil
+      
       brand_case = expected[1]
-      if brand_case == nil
+      if brand_case == :found
+        @base.expect{ factory.model.save }.
+          to @base.change{BikeModel.count + BikeBrand.count}.by(1)
+        @base.expect(factory.model.brand).to_not @base.be_nil
+      elsif brand_case == :new
+        @base.expect{ factory.model.save }.
+          to @base.change{BikeModel.count + BikeBrand.count}.by(2)      
+        @base.expect(factory.model.brand).to_not @base.be_nil
+      elsif brand_case == nil
+        @base.expect{ factory.model.save }.
+          to @base.change{BikeModel.count + BikeBrand.count}.by(1)      
         @base.expect(factory.model.brand).to @base.be_nil
       end
     end
@@ -76,7 +85,7 @@ class ModelFactoryAsserter
     return nil if scope.nil?
     id = case sym
            when :found then scope.name
-           when :new then scope.name.to_s + " new"
+         when :new then scope.name.to_s + " new#{scope.class.count+1}"
            else nil
          end
     return id
@@ -91,18 +100,23 @@ describe 'BikeModelFactory#model' do
 
   should = "should be nil"
   it should do @a.run(nil , nil) end
+  it should do @a.run([0,0,0,0] , nil) end
   
   should = "should be found"
   it should do @a.run([:found, 0, 0, 0],:found) end
   it should do @a.run([0, :found, 0, :found],:found) end
   it should do @a.run([0, :found, :found, 0],:found) end
 
+  should = "should be new with found brand"
+  it should do @a.run([0, :new, :found, 0], [:new, :found]) end
+
   should = "should be new with nil brand"
   it should do @a.run([0, :new, 0, 0], [:new, nil]) end
-  it should do @a.run([0, :new, 0, :new], [:new, nil]) end
 
-  it "should be new with found brand"
+  should = "should be new with found brand"
+  it should do @a.run([0, :new, :found, 0], [:new, :found]) end
 
-  it "should be new with new brand"
+  should = "should be new with new brand"
+  it should do @a.run([0, :new, 0, :new], [:new, :new]) end
 
 end # describe BikeModelFactory#model
