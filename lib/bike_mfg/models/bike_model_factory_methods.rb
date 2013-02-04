@@ -65,7 +65,6 @@ module BikeMfg
 
           # build the model if enough information is present
           model = build_model(@params.model_name, brand) if @params.model_name?
-          puts model.brand
         end
 
         model
@@ -100,11 +99,12 @@ module BikeMfg
           
           brand_constraint =  {:id => brand_id}  unless brand_id.nil?
           brand_constraint ||= {:name => brand_name} unless brand_name.nil?
-          brand_constraint ||= {:id => :id}
-          constraint = {brand_inclusion => brand_constraint}
           
-          # Find by name and brand constraint
-          m = NameQuery.new(name, @model_scope, brand_inclusion, :constraints => constraint).find
+          if brand_constraint
+            constraint = {brand_inclusion => brand_constraint}
+            # Find by name and brand constraint
+            m = NameQuery.new(name, @model_scope, brand_inclusion, :constraints => constraint).find
+          end
         end
 
         m
