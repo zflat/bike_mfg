@@ -13,7 +13,7 @@ end
 
 node(:results) do
   if @results
-    if @results.all.first.respond_to?(:brand)
+    if @results.first.respond_to?(:brand)
       @results.map { |o| {
           :text => o.name, :id => o.id, 
           :brand => o.brand.name, :brand_id => o.brand.id
