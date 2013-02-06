@@ -10,7 +10,9 @@ describe BikeModel do
 
   describe "new model with blank name" do
     it "should be valid" do
-      m = BikeModel.new(:name => '')
+      brand = BikeBrand.new(:name => "brand with blank model#{BikeBrand.count}")
+      brand.save
+      m = BikeModel.new(:name => '', :bike_brand_id => brand.id)
       expect(m).to be_valid
     end
   end

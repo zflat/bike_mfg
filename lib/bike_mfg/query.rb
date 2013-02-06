@@ -82,8 +82,7 @@ module BikeMfg
     end
     
   end # module Query
-  
-  
+
   class ModelsMatch
     include Query::PhraseTerms
 
@@ -95,9 +94,8 @@ module BikeMfg
 
     def models
       if @models.nil?
-        t = terms
         @models = @scope_models.
-          where{name.like_any t}.
+          where{name.like_any my{terms}}.
           includes{bike_brand}
       end
       @models
@@ -119,11 +117,10 @@ module BikeMfg
     
     def models
       if @models.nil?
-        t = terms
         @models = @scope_models.joins{bike_brand}.
           where{
-          (name.like_any t) & 
-          (bike_brand.name.like_any t)
+          (name.like_any my{terms}) & 
+          (bike_brand.name.like_any my{terms})
         }.includes{bike_brand}
       end
       @models
@@ -137,7 +134,7 @@ module BikeMfg
     # Brands without any matching models
     def indirect_brands
       if @indirect_brands.nil?
-        t = terms
+
         # Use contrapositive for the select
         # First get the opposite of what is needed
         # then exclude those from the final results
@@ -145,11 +142,11 @@ module BikeMfg
         # brands with matching models
         positive = @scope_brands.joins{bike_models}.
           where{
-          bike_models.name.like_any t
+          bike_models.name.like_any my{terms}
         }
         @indirect_brands = 
           @scope_brands.joins{bike_models}.where{
-          (name.like_any t) &
+          (name.like_any my{terms}) &
           (id.not_in(positive.select{id}))
         }.group{id}.includes{bike_models}
       end
@@ -159,6 +156,85 @@ module BikeMfg
   end # class 
   
   class ModelCollectionQuery
+
+    class ResultsCollection
+      def initialize ()
+        @results = {}
+      end
+
+      def self.missing_brand_id
+        :missing
+      end
+
+      def missing_brand_id
+        self.class.missing_brand_id
+      end
+
+      def self.read_val(obj, attr)
+        return nil if obj.nil?
+        val = obj.send(attr) if obj.respond_to?(attr)
+        val ||= obj[attr] if obj.respond_to?('[]')
+      end
+    
+      def self.brand_h(brand, direct=true)
+        name = read_val(brand,:name)
+        id = read_val(brand,:id)
+        id = nil if (id == missing_brand_id)
+        
+        {:name => name, :id=> id, :models => [], :direct => direct}
+      end
+
+      def brand_h(brand, direct=true)
+        self.class.brand_h(brand, direct)
+      end
+
+      def self.missing_brand
+        OpenStruct.new({
+          :name => nil, 
+          :id => missing_brand_id, 
+          :models => []
+        })
+      end
+
+      def missing_brand
+        self.class.missing_brand
+      end
+
+      def append(model, brand, direct=true)
+        brand ||= missing_brand
+
+        # get the brand_id
+        b_id = brand.id
+
+        # Add missing brand to the results
+        # (flag brand as direct=true)
+        @results[b_id] ||= brand_h(brand, direct)
+
+        # Append model, avoiding duplicates
+        @results[b_id][:models] |= [model]
+      end
+
+      def append_each(query_iter, direct=true)
+        query_iter.each do |model|
+          append(model, model.brand, direct)
+        end
+      end
+
+      def to_h
+        @results
+      end
+
+      def to_a
+        @results.map{ |key, val| OpenStruct.new val }
+      end
+
+      def include?(brand_id, model)
+        brand_id ||= missing_brand_id
+        @results[brand_id][:models].include?(model)
+      end
+
+    end # class ResultsCollection
+
     def initialize(search_phrase, scope = {})
       @phrase = search_phrase.strip unless search_phrase.blank?
       @scope_models = scope[:models] || BikeModel
@@ -166,53 +242,27 @@ module BikeMfg
     end
     
     attr_reader :phrase
-
-    def self.read_val(obj, sym)
-      val = obj.send(sym) if obj.respond_to?(sym)
-      val ||= obj[sym] if obj.respond_to?('[]')
-    end
-    
-    def self.brand_h(brand, direct=true)
-      name = read_val(brand,:name)
-      id = read_val(brand,:id)
-
-      {:name => name, :id=> id, :models => [], :direct => direct}
-    end
-    
-    def brand_h(brand, direct=true)
-      self.class.brand_h(brand, direct)
-    end
     
     def find_each(&block)
-      return nil if phrase.blank?
-      
       # results hash
-      r = {}
+      results = ResultsCollection.new
+
+      return results if phrase.blank?
       
-      q = DirectBrandAndModelQuery.new(phrase, :models => @scope_models, :brands => @scope_brands)
+      q = DirectBrandAndModelQuery.
+        new(phrase,
+            :models => @scope_models, 
+            :brands => @scope_brands)
       
       # Models & their brand match phrase
       direct_find = q.models      
-      direct_find.all.each do |model|
-        b_id = model.brand.id
-        
-        # Add missing brand to the results
-        # (flag brand as direct=true)
-        r[b_id] ||= brand_h(model.brand)
-        
-        # Append model
-        r[b_id][:models] << model
-      end
+      results.append_each(direct_find, true)
       
       # Models associated with brands such that
       # the brands match the phrase, but no
       # model associated with the brand matched
       indirect_find = q.indirect_models
-      indirect_find.all.each do |model|
-        b_id = model.brand.id
-        r[b_id] ||= brand_h(model.brand)
-        r[b_id][:models] << model        
-      end
+      results.append_each(indirect_find, true)
       
       # Models that match the phrase, but
       # may not have a brand that also
@@ -220,16 +270,16 @@ module BikeMfg
       #
       # Brands that need to be added from this
       # query are to be considered indirect
-      q_any = ModelsMatch.new(phrase,:models => @scope_models, :brands => @scope_brands)
-      q_any.models.all.each do |model|
-        b_id = model.brand.id
-        r[b_id] ||= brand_h(model.brand, false)
-        r[b_id][:models] |= [model]
-      end
+      q_any = ModelsMatch.
+        new(phrase,
+            :models => @scope_models, 
+            :brands => @scope_brands)
+      results.append_each(q_any.models.all, false)
       
-      return r.map{ |key, val| OpenStruct.new val }
+      return results
     end #find_each
-  end #  ModelCollectionQuery
+
+  end # class  ModelCollectionQuery
 
   class NameQuery
     include Query::PhraseTerms
@@ -254,10 +304,9 @@ module BikeMfg
     end
     
     def find_each(&block)
-      return nil if phrase.blank?
-      t = terms
+      return [] if phrase.blank?
       return @scope.joins{@inclusion}.
-        where{(name.like_any t) &
+        where{(name.like_any my{terms}) &
         (my{@constraints})
       }.
         includes{@inclusion}

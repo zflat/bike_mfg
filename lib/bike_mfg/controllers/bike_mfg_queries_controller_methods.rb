@@ -9,18 +9,18 @@ module BikeMfg
       
       # Actions
       def search_brands
-        @results = BikeMfg::NameQuery.new(term, BikeBrand, :bike_models).find_each
+        @results = BikeMfg::NameQuery.new(term, BikeBrand, :bike_models).find_each.to_a
         render :flat_results and return
       end
 
       def search
-        @results = BikeMfg::ModelCollectionQuery.new(term).find_each        
+        @results = BikeMfg::ModelCollectionQuery.new(term).find_each.to_a        
         render :nested_results and return
       end
 
       def search_models
         @results = BikeMfg::NameQuery.new(term, BikeModel, :bike_brand, 
-                                          :constraints => brand_constraint).find_each
+                                          :constraints => brand_constraint).find_each.to_a
         render :flat_results and return
       end
 
