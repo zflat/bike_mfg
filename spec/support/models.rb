@@ -19,9 +19,6 @@ class Models
     model_without_name = BikeModel.new(:name => '', :bike_brand_id => brand.id)
     model_without_name.save
 
-    # model without a brand or name
-    BikeModel.new(:name => '').save
-    
   end # self.make
 
 end

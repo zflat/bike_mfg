@@ -5,6 +5,9 @@ module BikeMfg
         base.send :belongs_to, :bike_brand
         base.send :attr_accessible, :name, :bike_brand_id
         base.send :validates_uniqueness_of, :name, :scope => :bike_brand_id
+        base.send :validates, :name, :presence => true, :if => 'bike_brand_id.nil?'
+        # prevent name from being nil, but allow it to be an empty string
+        base.send :validates, :name, :presence => true, :if => 'name.nil?'
       end # self.included
 
       # instance methods
