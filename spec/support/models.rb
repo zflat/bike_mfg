@@ -14,9 +14,14 @@ class Models
       bike_model = BikeModel.make! # models without a brand assigned
     end
 
-    brand = BikeBrand.new(:name => "brand with blank model#{BikeBrand.count}")
-    brand.save
-    model_without_name = BikeModel.new(:name => '', :bike_brand_id => brand.id)
+    brand_without_models = BikeBrand.new(:name => "brand with no models#{BikeBrand.count}")
+    brand_without_models.save
+
+    brand_for_blank_model = BikeBrand.new(:name => "brand with blank model #{BikeBrand.count}")
+    brand_for_blank_model.save
+
+    model_without_name = BikeModel.new(:name => '', 
+                                       :bike_brand_id => brand_for_blank_model.id)
     model_without_name.save
 
   end # self.make

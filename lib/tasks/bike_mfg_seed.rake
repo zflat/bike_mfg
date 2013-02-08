@@ -29,8 +29,11 @@ namespace :db do
         end
       end
       puts "Task complete"
-    end
-  end
-end
+    end #     task :seed => :environment
+  end # namespace :db
+end # namespace :bike_mfg
+
+
+
 
 

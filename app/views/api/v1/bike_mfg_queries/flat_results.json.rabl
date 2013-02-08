@@ -1,6 +1,3 @@
-#collection @models, :root => :results, :object_root => false
-#attributes :name => :text, :id => :id
-
 object false
 
 node do |m|
@@ -11,13 +8,21 @@ node do |m|
  {:q => term}
 end
 
+node :debug do
+  {:class => @results.class}
+end
+
 node(:results) do
   if @results
     if @results.first.respond_to?(:brand)
-      @results.map { |o| {
-          :text => o.name, :id => o.id, 
-          :brand => o.brand.name, :brand_id => o.brand.id
-        } }
+      @results.map { |o|
+        {
+          :text => o.name, 
+          :id => o.id, 
+          :brand => (o.brand.nil?) ? nil : o.brand.name, 
+          :brand_id => (o.brand.nil?) ? nil : o.brand.id
+        } 
+      }
     else
       @results.map { |o| {:text => o.name, :id => o.id} }
     end
