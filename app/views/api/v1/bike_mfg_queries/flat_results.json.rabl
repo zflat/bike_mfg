@@ -8,10 +8,6 @@ node do |m|
  {:q => term}
 end
 
-node :debug do
-  {:class => @results.class}
-end
-
 node(:results) do
   if @results
     if @results.first.respond_to?(:brand)
