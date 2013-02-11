@@ -78,7 +78,7 @@ module BikeMfg
       scope.joins{bike_brand}.
         where{
         bike_brand.id.in(brand_rel.select{id})
-      }.group{id}.includes{bike_brand}
+      }.includes{bike_brand}
     end
     
   end # module Query
@@ -155,7 +155,7 @@ module BikeMfg
            ( id.not_in(matching_models.select{id}) ) |
            ( id.not_in(containing_models.select{id}) )
           )
-        }.group{id}.includes{bike_models}
+        }.includes{bike_models}
       end
       @indirect_brands
     end
