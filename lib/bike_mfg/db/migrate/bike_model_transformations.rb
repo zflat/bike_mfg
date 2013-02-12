@@ -3,16 +3,19 @@ module BikeMfg
     module Migrate
       module BikeModelTransformations
 
-        def BikeModelTransformations.create_table_bike_models(base)
+        def BikeModelTransformations.up(base)
           base.create_table :bike_models do |t|
             t.string "name", :null => false
             t.integer "bike_brand_id", :null => true
             #t.timestamps
           end
+
+          base.add_index :bike_models, :bike_brand_id
+          base.add_index :bike_models, :name
         end
 
-        def create_table_transformation
-          BikeModelTransformations.create_table_bike_models self
+        def table_up_transformation
+          BikeModelTransformations.up self
         end
         
       end

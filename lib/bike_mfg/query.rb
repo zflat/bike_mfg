@@ -12,12 +12,12 @@ module BikeMfg
       private
       
       def set_phrase_terms(phrase)
-        @phrase = phrase
+        @phrase = phrase.to_s
         @phrase = @phrase.strip unless @phrase.blank?
         if @terms.nil? && @phrase
-          @terms ||= 
-            "%#{@phrase.gsub('%', '/%')}%".
-            gsub(' ', '% %').split(' ')
+          @phrase = "#{@phrase.gsub('%', '/%')}%"
+          @terms ||= [@phrase]+
+            @phrase.gsub(' ', '% ').split(' ')
         end
       end
     end # module
@@ -89,6 +89,8 @@ module BikeMfg
     def initialize(search_phrase, scope = {})
       @scope_models = scope[:models] || ::BikeModel
       @scope_brands = scope[:brands] || ::BikeBrand
+      @models_limit = scope[:models_limit]
+      @brands_limit = scope[:brands_limit]
       set_phrase_terms(search_phrase)
     end
 
@@ -96,7 +98,7 @@ module BikeMfg
       if @models.nil?
         @models = @scope_models.
           where{name.like_any my{terms}}.
-          includes{bike_brand}
+          includes{bike_brand}.limit(@models_limit)
       end
       @models
     end
@@ -112,6 +114,8 @@ module BikeMfg
     def initialize(search_phrase, scope = {})
       @scope_models = scope[:models] || ::BikeModel
       @scope_brands = scope[:brands] || ::BikeBrand
+      @models_limit = scope[:models_limit]
+      @brands_limit = scope[:brands_limit]
       set_phrase_terms(search_phrase)
     end
     
@@ -121,13 +125,14 @@ module BikeMfg
           where{
           (name.like_any my{terms}) & 
           (bike_brand.name.like_any my{terms})
-        }.includes{bike_brand}
+        }.includes{bike_brand}.limit(@models_limit)
       end
       @models
     end
     
     def indirect_models
-      @indirect_models ||= Query::related_models(indirect_brands(), @scope_models)
+      @indirect_models ||= Query::related_models(indirect_brands(), @scope_models).
+        limit(@models_limit)
       @indirect_models
     end
     
@@ -143,7 +148,7 @@ module BikeMfg
         matching_models = @scope_brands.joins{bike_models}.
           where{
           bike_models.name.like_any my{terms}
-        }
+        }.limit(@models_limit)
 
         # brands with models
         containing_models = @scope_brands.joins{bike_models}
@@ -155,7 +160,7 @@ module BikeMfg
            ( id.not_in(matching_models.select{id}) ) |
            ( id.not_in(containing_models.select{id}) )
           )
-        }.includes{bike_models}
+        }.includes{bike_models}.limit(@brands_limit)
       end
       @indirect_brands
     end
@@ -255,11 +260,15 @@ module BikeMfg
       results = ResultsCollection.new
 
       return results if phrase.blank?
-      
+
+      soft_limit = 50
       q = DirectBrandAndModelQuery.
         new(phrase,
             :models => @scope_models, 
-            :brands => @scope_brands)
+            :brands => @scope_brands,
+            :models_limit => soft_limit,
+            :brands_limit => soft_limit)
+
       
       # Models & their brand match phrase
       direct_find = q.models      
@@ -284,7 +293,9 @@ module BikeMfg
       q_any = ModelsMatch.
         new(phrase,
             :models => @scope_models, 
-            :brands => @scope_brands)
+            :brands => @scope_brands,
+            :models_limit => soft_limit,
+            :brands_limit => soft_limit)
       results.append_each(q_any.models.all, false)
 
       return results
