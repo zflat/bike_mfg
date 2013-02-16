@@ -15,9 +15,8 @@ module BikeMfg
         @phrase = phrase.to_s
         @phrase = @phrase.strip unless @phrase.blank?
         if @terms.nil? && @phrase
-          @phrase = "#{@phrase.gsub('%', '/%')}%"
-          @terms ||= [@phrase]+
-            @phrase.gsub(' ', '% ').split(' ')
+          @terms ||= "#{@phrase.gsub('%', '/%')}%".
+            gsub(' ', '% ').split(' ')
         end
       end
     end # module
@@ -333,7 +332,7 @@ module BikeMfg
       }.
         includes{@inclusion}
     end # find_each
-
+    
   end # class NameQuery
 end
   

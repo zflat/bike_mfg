@@ -14,8 +14,8 @@ ActiveRecord::Base.silence do
 
   ActiveRecord::Schema.define do
 
-    BikeMfg::Db::Migrate::BikeBrandTransformations.create_table_bike_brands self
-    BikeMfg::Db::Migrate::BikeModelTransformations.create_table_bike_models self
+    BikeMfg::Db::Migrate::BikeBrandTransformations.up self
+    BikeMfg::Db::Migrate::BikeModelTransformations.up self
 
   end #   ActiveRecord::Schema.define
 end
