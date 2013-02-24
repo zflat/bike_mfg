@@ -153,8 +153,15 @@ describe 'BikeModelFactory#model' do
   it should do @a.run([0, :new, :found, 0], [:new, :found]) end
   it should do @a.run([0, :new, 0, :found], [:new, :found]) end
 
+  should = "should be new (or found?) with found brand"
+  it should do @a.run([0, 0, :found, 0], [:new, :found]) end
+  it should do @a.run([0, 0, 0, :found], [:new, :found]) end
+
   should = "should be new with new brand"
   it should do @a.run([0, :new, 0, :new], [:new, :new]) end
+
+  should = "should be new (or found?) with new brand"
+  it should do @a.run([0, 0, 0, :new], [:new, :new]) end
   
   should = "should raise exception"
   it should do @a.run([0, 0, :found, :found], :exception) end
