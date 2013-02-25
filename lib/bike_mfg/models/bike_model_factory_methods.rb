@@ -63,8 +63,8 @@ module BikeMfg
           brand = get_brand(@params)
           brand ||= build_brand(@params.brand_name) if @params.brand_name?
 
-          # build the model if enough information is present
-          model = build_model(@params.model_name, brand) if @params.model_name?
+          # build the model
+          model = build_model(@params.model_name, brand)
         end
 
         model
@@ -135,8 +135,11 @@ module BikeMfg
 
       def build_model(name, brand)
         model = nil
-
-        if !name.nil?
+        
+        valid_args = (!name.blank? || !brand.nil?)
+        
+        if valid_args
+          name ||= ''
           params = {:name => name}
           model = @model_scope.new(params)
 
