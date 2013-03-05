@@ -6,7 +6,6 @@ namespace :db do
   namespace :bike_mfg do
     desc "Insert bike mfg seed data into database"
     task :seed => :environment do
-      #Rake::Task["db:seed"].invoke
       puts "Rake task seed bike mfg data"
       ActiveRecord::Base.establish_connection
 
@@ -25,13 +24,28 @@ namespace :db do
         rescue Exception => e  
           puts "exception executing statement"
           puts e.message  
-          # puts e.backtrace.inspect
         end
       end
+
       puts "Task complete"
     end #     task :seed => :environment
-  end # namespace :db
-end # namespace :bike_mfg
+
+    desc "Reset primary key indicies that may be out of sync to do data import"
+    task :index_repair => :environment do
+      ActiveRecord::Base.establish_connection
+      %w[bike_brands bike_models].each do |table|
+        begin
+          puts ActiveRecord::Base.connection.execute("select max(id) from #{table}")
+          puts ActiveRecord::Base.connection.execute("select setval('#{table}_id_seq', (select max(id) from #{table}))")
+        rescue Exception => e  
+          puts "exception executing statement"
+          puts e.message  
+        end
+      end # each |table|
+    end # task :index_repair
+    
+  end # namespace :bike_mfg
+end # namespace :db
 
 
 
