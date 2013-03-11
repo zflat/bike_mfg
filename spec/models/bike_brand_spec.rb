@@ -3,15 +3,22 @@ require 'spec_helper'
 describe BikeBrand do
 
   describe "collection" do
-    it "should have brands" do
+    it "has brands" do
       expect(BikeBrand.count>0).to be_true
     end
 
-    it "should each have a name" do
-      BikeBrand.all.each do |b|
-        expect(b.name).to_not be_nil
+    describe "each member" do
+      it "has a name" do
+        BikeBrand.all.each do |b|
+          expect(b.name).to_not be_nil
+        end
       end
     end
+  end
+
+  subject(:brand){BikeBrand.new}
+  it "has models" do
+    expect(brand.models).to_not be_nil
   end
 
   describe "new brand with non-unique name" do

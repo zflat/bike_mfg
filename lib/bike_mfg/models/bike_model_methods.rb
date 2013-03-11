@@ -11,17 +11,13 @@ module BikeMfg
                   :validates, :name, 
                   :presence => {:message => "can't be missing", :if => 'name.nil?'}
                   )
+        base.send :alias_attribute, :brand, :bike_brand
       end # self.included
 
       # instance methods
       def to_s
         self.name
       end
-      
-      def brand
-        self.bike_brand
-      end
-
     end # module BikeModelMethods
   end
 end

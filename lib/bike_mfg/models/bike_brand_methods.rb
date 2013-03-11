@@ -6,15 +6,12 @@ module BikeMfg
         base.send :attr_accessible, :name
         base.send :validates_presence_of, :name
         base.send :validates_uniqueness_of, :name
+        base.send :alias_attribute, :models, :bike_models
       end # self.included
 
       # instance methods
       def to_s
         self.name
-      end
-
-      def models
-        self.bike_models
       end
     end
   end

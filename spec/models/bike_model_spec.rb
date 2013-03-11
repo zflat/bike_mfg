@@ -8,29 +8,40 @@ describe BikeModel do
     end
   end
 
-  describe "a new model with a brand" do
-    
-    it "should be valid when the name is present and unique" do
-      brand = BikeBrand.all.first
+  context "with a brand" do
+    context "when the name is present and unique" do
+      let(:brand){BikeBrand.all.first}
+      let(:new_name){BikeModel.all.last.name + 'new'}
+      subject(:model){BikeModel.new(:name => new_name , :bike_brand_id => brand.id)}
 
-      new_name = BikeModel.all.last.name + 'new'
-      m = BikeModel.new(:name => new_name , :bike_brand_id => brand.id)
-      expect(m).to be_valid
+      it "is valid" do
+        expect(model).to be_valid
+      end
+
+      it "references the brand" do
+        expect(model.brand).to eq brand
+      end
     end
 
-    it "should be valid when the name is present and unique to the brand" do
-      models_with_brand = BikeModel.where{bike_brand_id != nil}
+    context "when the name is present and unique to the brand" do
+      
+      let(:models_with_brand){BikeModel.where{bike_brand_id != nil}}
+      let(:model0){models_with_brand.first}
+      let(:new_name){model0.name}
 
-      model0 = models_with_brand.first
-      new_name = model0.name
+      let(:models_with_same_name){BikeModel.where{name == my{new_name}}}
+      let(:brand){BikeBrand.where{id.not_in(my{models_with_same_name}.select{bike_brand_id})}.first}
+      
+      describe "model new to the brand" do
+        it "has a name unique to the brand" do
+          expect(model0.brand).to_not eq(brand)      
+        end
+      end
 
-      models_with_same_name = BikeModel.where{name == my{new_name}}
-      brand1 = BikeBrand.where{id.not_in(models_with_same_name.select{bike_brand_id})}.first
-
-      expect(model0.brand).to_not eq(brand1)      
-
-      m = BikeModel.new(:name => new_name , :bike_brand_id => brand1.id)
-      expect(m).to be_valid
+      subject(:model){BikeModel.new(:name => new_name , :bike_brand_id => brand.id)}
+      it "is valid " do
+        expect(model).to be_valid
+      end
     end
 
     it "should not be valid when the name is present and not unique to the brand" do
