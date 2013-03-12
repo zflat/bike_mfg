@@ -184,8 +184,12 @@ module BikeMfg
       def set_flags(list)
         list.each do |p|
           val = @params.send("#{p}")
-          present = !val.nil? && val.to_s.strip != ''
-          @params.send("#{p}?=", present)
+          if val.respond_to?(:present?)
+            @params.send("#{p}?=", val.present?)
+          else
+            present = !val.nil? && val.to_s.strip != ''
+            @params.send("#{p}?=", present)
+          end
         end
       end
 
