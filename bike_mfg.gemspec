@@ -1,6 +1,4 @@
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'bike_mfg/version'
+require File.expand_path("../lib/bike_mfg/version", __FILE__)
 
 Gem::Specification.new do |gem|
   gem.name          = "bike_mfg"
