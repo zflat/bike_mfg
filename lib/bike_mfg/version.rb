@@ -1,3 +1,3 @@
 module BikeMfg
-  VERSION = "0.1.4" unless defined?(BikeMFG::VERSION)
+  VERSION = "0.1.5" unless defined?(BikeMFG::VERSION)
 end
