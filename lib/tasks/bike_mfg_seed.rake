@@ -30,7 +30,7 @@ namespace :db do
       puts "Task complete"
     end #     task :seed => :environment
 
-    desc "Reset primary key indicies that may be out of sync to do data import"
+    desc "Reset primary key indicies that may be out of sync due to do data import"
     task :index_repair => :environment do
       ActiveRecord::Base.establish_connection
       %w[bike_brands bike_models].each do |table|

@@ -9,13 +9,13 @@ ActiveRecord::Base.establish_connection(
 require 'bike_mfg/db/migrate/bike_brand_transformations'
 require 'bike_mfg/db/migrate/bike_model_transformations'
 
-ActiveRecord::Base.silence do
-  ActiveRecord::Migration.verbose = false
 
-  ActiveRecord::Schema.define do
+ActiveRecord::Migration.verbose = false
 
-    BikeMfg::Db::Migrate::BikeBrandTransformations.up self
-    BikeMfg::Db::Migrate::BikeModelTransformations.up self
+ActiveRecord::Schema.define do
 
-  end #   ActiveRecord::Schema.define
-end
+  BikeMfg::Db::Migrate::BikeBrandTransformations.up self
+  BikeMfg::Db::Migrate::BikeModelTransformations.up self
+
+end #   ActiveRecord::Schema.define
+

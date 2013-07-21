@@ -77,7 +77,7 @@ module BikeMfg
       scope.joins{bike_brand}.
         where{
         bike_brand.id.in(brand_rel.select{id})
-      }.includes{bike_brand}
+      }.includes{bike_brand}.references(:bike_brand)
     end
     
   end # module Query
@@ -97,7 +97,7 @@ module BikeMfg
       if @models.nil?
         @models = @scope_models.
           where{name.like_any my{terms}}.
-          includes{bike_brand}.limit(@models_limit)
+          includes{bike_brand}.limit(@models_limit).references(:bike_brand)
       end
       @models
     end
@@ -124,7 +124,7 @@ module BikeMfg
           where{
           (name.like_any my{terms}) & 
           (bike_brand.name.like_any my{terms})
-        }.includes{bike_brand}.limit(@models_limit)
+        }.includes{bike_brand}.limit(@models_limit).references(:bike_brand)
       end
       @models
     end
@@ -159,7 +159,7 @@ module BikeMfg
            ( id.not_in(matching_models.select{id}) ) |
            ( id.not_in(containing_models.select{id}) )
           )
-        }.includes{bike_models}.limit(@brands_limit)
+        }.includes{bike_models}.limit(@brands_limit).references(:bike_models)
       end
       @indirect_brands
     end
@@ -295,7 +295,7 @@ module BikeMfg
             :brands => @scope_brands,
             :models_limit => soft_limit,
             :brands_limit => soft_limit)
-      results.append_each(q_any.models.all, false)
+      results.append_each(q_any.models.to_a, false)
 
       return results
     end #find_each
@@ -321,7 +321,7 @@ module BikeMfg
         where{(name == my{phrase}) & 
         (my{@constraints})
       }.
-        includes(@inclusion).first
+        includes(@inclusion).references(@inclusion).first
     end
     
     def find_each(&block)
@@ -330,7 +330,7 @@ module BikeMfg
         where{(name.like_any my{terms}) &
         (my{@constraints})
       }.
-        includes{@inclusion}
+        includes{@inclusion}.references(@inclusion)
     end # find_each
     
   end # class NameQuery
