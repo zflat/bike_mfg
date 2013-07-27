@@ -140,8 +140,9 @@ module BikeMfg
         
         if valid_args
           name ||= ''
-          params = {:name => name}
-          model = @model_scope.new(params)
+
+          model = @model_scope.new
+          model.name = name
 
           # assign the brand
           model.send(prefixed(:brand=), brand) if model          
@@ -151,11 +152,13 @@ module BikeMfg
       end
 
       def build_brand(name)
-        params = {:name=>name} unless name.blank?
-        brand = @brand_scope.new(params) unless params.nil?
+        brand = nil
+        unless name.blank?
+          brand = @brand_scope.new
+          brand.name = name
+        end
         brand
       end
-
 
       def parse_param_prefix(arg)
         @param_prefix = arg.to_s
