@@ -159,7 +159,7 @@ module BikeMfg
            ( id.not_in(matching_models.select{id}) ) |
            ( id.not_in(containing_models.select{id}) )
           )
-        }.includes{bike_models}.limit(@brands_limit).references(:bike_models)
+        }.includes{bike_models}.references(:bike_models)
       end
       @indirect_brands
     end
@@ -276,7 +276,7 @@ module BikeMfg
       # Models associated with brands such that
       # the brands match the phrase, but no
       # model associated with the brand matched
-      q.indirect_brands.each do |b|
+      q.indirect_brands.limit(@brands_limit).each do |b|
         # Be sure to include the brand even if 
         # it is without models by appending nil
         results.append(nil, b, true)
