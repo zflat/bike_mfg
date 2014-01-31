@@ -130,8 +130,8 @@ module BikeMfg
     end
     
     def indirect_models
-      @indirect_models ||= Query::related_models(indirect_brands(), @scope_models).
-        limit(@models_limit)
+      @indirect_models ||= 
+        Query::related_models(indirect_brands(), @scope_models)
       @indirect_models
     end
     
@@ -147,7 +147,7 @@ module BikeMfg
         matching_models = @scope_brands.joins{bike_models}.
           where{
           bike_models.name.like_any my{terms}
-        }.limit(@models_limit)
+        }
 
         # brands with models
         containing_models = @scope_brands.joins{bike_models}
@@ -281,7 +281,7 @@ module BikeMfg
         # it is without models by appending nil
         results.append(nil, b, true)
       end
-      results.append_each(q.indirect_models, true)
+      results.append_each(q.indirect_models.limit(@models_limit), true)
       
       # Models that match the phrase, but
       # may not have a brand that also
