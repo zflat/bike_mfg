@@ -20,7 +20,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'machinist', '~> 2.0'
   gem.add_development_dependency 'sqlite3', '~> 1.3.3'
 
-  gem.add_dependency( "activemodel", "~> 4.1.5")
+  gem.add_dependency( "activemodel", ">= 4")
   gem.add_dependency( "squeel", "~> 1.2.1")
   gem.add_dependency( "rabl", ">= 0.8.6")
   gem.add_dependency( "oj", ">= 0")
