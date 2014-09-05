@@ -27,7 +27,7 @@ module BikeMfg
         end
         it "should match the model" do
           expect(@q.find_each).to_not be_nil
-          expect(@q.find_each.include?(@model.brand.id, @model)).to be_true
+          expect(@q.find_each.include?(@model.brand.id, @model)).to be_truthy
         end
       end
 
@@ -39,7 +39,7 @@ module BikeMfg
         end
         it "should match the model" do
           expect(@q.find_each).to_not be_nil
-          expect(@q.find_each.include?(nil, @model)).to be_true
+          expect(@q.find_each.include?(nil, @model)).to be_truthy
         end
         
         it "to_h should list an unknown brand" do
@@ -50,7 +50,7 @@ module BikeMfg
               unknown_present = true
             end
           end
-          expect(unknown_present).to be_true
+          expect(unknown_present).to be_truthy
         end
 
         it "to_a should list an unknown brand" do
@@ -78,7 +78,7 @@ module BikeMfg
 
         it "should find the brand" do
           h = @q.find_each.to_h
-          expect(h.keys.include? @brand_without_models.id).to be_true
+          expect(h.keys.include? @brand_without_models.id).to be_truthy
         end
 
       end # context "on a known brand that has no models" do
@@ -96,7 +96,7 @@ module BikeMfg
       end
 
       it "should have direct defalt value" do
-        expect(@blank[:direct]).to be_true
+        expect(@blank[:direct]).to be_truthy
       end
 
       it "should have default models empty array" do

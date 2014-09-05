@@ -37,7 +37,7 @@ module BikeMfg
           s0 = 'test'
           s1 = String.new(s0)
           
-          expect(@m.match?(s0, s1)).to be_true
+          expect(@m.match?(s0, s1)).to be_truthy
         end
 
       end #  describe "on to_s function" 

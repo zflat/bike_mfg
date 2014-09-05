@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_development_dependency(%q<rake>, [">= 0"])
-  gem.add_development_dependency(%q<rspec>, [">= 1.3.0"])
+  gem.add_development_dependency(%q<rspec>, ["~> 3.0.0"])
   gem.add_development_dependency(%q<bundler>, ["~> 1.2"])
   gem.add_development_dependency 'machinist', '~> 2.0'
   gem.add_development_dependency 'sqlite3', '~> 1.3.3'

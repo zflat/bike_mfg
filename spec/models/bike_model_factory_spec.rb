@@ -102,7 +102,7 @@ class ModelFactoryAsserter
       rescue Exception
         e_thrown = true
       end
-      @base.expect(e_thrown).to @base.be_true
+      @base.expect(e_thrown).to @base.be_truthy
     end
   end
 

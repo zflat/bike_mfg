@@ -4,7 +4,7 @@ describe BikeBrand do
 
   describe "collection" do
     it "has brands" do
-      expect(BikeBrand.count>0).to be_true
+      expect(BikeBrand.count>0).to be_truthy
     end
 
     describe "each member" do

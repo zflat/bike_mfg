@@ -90,7 +90,7 @@ module BikeMfg
         term = brand.name
         r = NameQuery.new(term, @scope, :bike_models).find_each
         expect(r).to_not be_nil
-        expect(r.include?(brand)).to be_true
+        expect(r.include?(brand)).to be_truthy
       end
 
       it "should have empty results for empty query" do
@@ -123,7 +123,7 @@ module BikeMfg
         term = model.name
         r = NameQuery.new(term, @scope, :bike_brand).find_each
         expect(r).to_not be_nil
-        expect(r.include?(model)).to be_true
+        expect(r.include?(model)).to be_truthy
       end
 
       it "should find a known model given consistent constraints" do
