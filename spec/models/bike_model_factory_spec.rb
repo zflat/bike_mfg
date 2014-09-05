@@ -11,6 +11,30 @@ describe BikeModelFactory do
     factory = BikeModelFactory.new(args)
     expect(factory).to_not be_nil
   end
+
+  context "constructed with nil params" do
+    let(:params){h={:model_id => nil,
+        :model_name =>nil,
+        :brand_id =>nil,
+        :brand_name => nil,
+      :param_prefix => :bike}}
+    subject(:factory){BikeModelFactory.new(params)}
+    it "is not nil" do
+      expect(factory).to_not be_nil
+    end
+  end
+
+  context "constructed with model name and brand name" do
+    let(:params){h={:model_id => nil,
+        :model_name =>'mymodelname',
+        :brand_id =>nil,
+        :brand_name => 'mybrandname',
+      :param_prefix => :bike}}
+    subject(:factory){BikeModelFactory.new(params)}
+    it "is not nil" do
+      expect(factory).to_not be_nil
+    end
+  end
 end
 
 class ModelFactoryAsserter
@@ -144,14 +168,20 @@ describe 'BikeModelFactory#model' do
   it should do @a.run([:missing,0,0,0] , nil) end
   
   should = "should be found"
-  it should do @a.run([:found, 0, 0, 0],:found) end
-  it should do @a.run([0, :found, 0, :found],:found) end
-  it should do @a.run([0, :found, :found, 0],[:found, :found]) end
-  it should do @b.run([0, :found, 0, 0], [:found, nil]) end
-  it should do @c.run([0, :found, :found, 0], :found) end
-  it should do @c.run([0, :found, 0, :found], :found) end
-  it should do @c.run([0, 0, :found, 0], [:found, :found]) end
-  it should do @c.run([0, 0, 0, :found], [:found, :found]) end
+  context "with brand" do
+    it should do @a.run([:found, 0, 0, 0],:found) end
+    it should do @a.run([0, :found, 0, :found],:found) end
+    it should do @a.run([0, :found, :found, 0],[:found, :found]) end
+  end
+  context "without brand" do
+    it should do @b.run([0, :found, 0, 0], [:found, nil]) end
+  end
+  context "model without name" do
+    it should do @c.run([0, :found, :found, 0], :found) end
+    it should do @c.run([0, :found, 0, :found], :found) end
+    it should do @c.run([0, 0, :found, 0], [:found, :found]) end
+    it should do @c.run([0, 0, 0, :found], [:found, :found]) end
+  end
   
   should = "should be new with nil brand"
   it should do @a.run([0, :new, 0, 0], [:new, nil]) end

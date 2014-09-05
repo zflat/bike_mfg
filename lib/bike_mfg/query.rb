@@ -305,6 +305,8 @@ module BikeMfg
   class NameQuery
     include Query::PhraseTerms
 
+    attr_reader :constraints, :inclusion, :scope
+
     def initialize(search_phrase, scope, inclusion, opts ={})
       @constraints = {:id => :id}
       @constraints = opts[:constraints] unless opts[:constraints].nil?
@@ -316,12 +318,12 @@ module BikeMfg
 
     def find(&block)
       # return nil if phrase.blank?
-      
-      return @scope.joins{@inclusion}.
+      outer_join = Squeel::Nodes::Join.new(@inclusion, Arel::OuterJoin)
+      return @scope.joins{my{outer_join}}.
         where{(name == my{phrase}) & 
         (my{@constraints})
       }.
-        includes(@inclusion).references(@inclusion).first
+        includes(@inclusion).first
     end
     
     def find_each(&block)

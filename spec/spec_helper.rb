@@ -5,6 +5,8 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'rspec'
 require 'machinist/active_record'
 
+I18n.enforce_available_locales = false
+
 class String
   def blank?
     strip.length == 0
