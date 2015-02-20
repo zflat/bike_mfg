@@ -318,7 +318,7 @@ module BikeMfg
 
     def find(&block)
       # return nil if phrase.blank?
-      outer_join = Squeel::Nodes::Join.new(@inclusion, Arel::OuterJoin)
+      outer_join = Squeel::Nodes::Join.new(@inclusion, Squeel::OuterJoin)
       return @scope.joins{my{outer_join}}.
         where{(name == my{phrase}) & 
         (my{@constraints})

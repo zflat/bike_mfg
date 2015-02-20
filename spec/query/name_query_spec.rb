@@ -51,7 +51,7 @@ module BikeMfg
       
       it "finds the model" do
         expect(
-               BikeModel.joins{my{Squeel::Nodes::Join.new(:bike_brand, Arel::OuterJoin)}}.where{
+               BikeModel.joins{my{Squeel::Nodes::Join.new(:bike_brand, Squeel::OuterJoin)}}.where{
                  (name==my{name})
                  }.includes(:bike_brand).references(:bike_brand).first
                ).to_not be_nil
