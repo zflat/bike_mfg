@@ -1,3 +1,5 @@
+# -*- mode: ruby -*-
+
 object false
 
 node do |m|

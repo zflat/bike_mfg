@@ -1,9 +1,21 @@
+RSPEC_ROOT = File.dirname(__FILE__)
+
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib/bike_mfg'))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'app/models'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'rspec'
+
+require 'active_support'
+require 'action_view'
+require 'action_controller'
+require 'rails'
+
+require 'rspec/rails'
 require 'machinist/active_record'
+require 'rabl'
+Rabl.configure do |config|
+  config.view_paths = [$LOAD_PATH.unshift(File.join(RSPEC_ROOT, '..', 'app/views'))]
+end
 
 I18n.enforce_available_locales = false
 

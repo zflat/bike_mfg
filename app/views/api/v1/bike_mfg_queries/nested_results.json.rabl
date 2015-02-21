@@ -1,3 +1,5 @@
+# -*- mode: ruby -*-
+
 object false
 
 node do |m|
@@ -16,18 +18,18 @@ node(:results) do |m|
       else
         { :text => brand.name, 
           :brand_id => brand.id,
-          :children => brand.models ? brand.models.map do |model| 
+          :children => brand.models ? brand.models.map{ |model| 
             { :text => model.name, 
               :id => model.id, 
               :brand => (model.brand.nil?) ? nil : model.brand.name,
               :brand_id => (model.brand.nil?) ? nil : model.brand.id } 
-          end : [],
+          } : [],
           :direct => brand.direct
         }
       end
     end
   else
-    ['no results here!']
+    []
   end
 end
 

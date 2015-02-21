@@ -16,11 +16,15 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency(%q<rake>, [">= 0"])
   gem.add_development_dependency(%q<rspec>, ["~> 3.0.0"])
+  gem.add_development_dependency(%q<rspec-rails>, ["~> 3.0.0"])
   gem.add_development_dependency(%q<bundler>, ["~> 1.2"])
   gem.add_development_dependency 'machinist', '~> 2.0'
-  gem.add_development_dependency 'sqlite3', '~> 1.3.3'
+  gem.add_development_dependency 'sqlite3', '~> 1.3.10'
 
   gem.add_dependency( "activemodel", ">= 4")
+  gem.add_dependency( "actionview", ">= 4")
+  gem.add_dependency( "activesupport", ">= 4")
+  gem.add_dependency( "railties", ">= 4")
   gem.add_dependency( "squeel", "~> 1.2.3")
   gem.add_dependency( "rabl", ">= 0.8.6")
   gem.add_dependency( "oj", ">= 0")
