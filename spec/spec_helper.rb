@@ -19,6 +19,13 @@ end
 
 I18n.enforce_available_locales = false
 
+require 'bike_brand'
+require 'bike_model'
+require 'bike_model_factory'
+ActiveSupport::Dependencies::Loadable.unloadable BikeBrand
+ActiveSupport::Dependencies::Loadable.unloadable BikeModel
+ActiveSupport::Dependencies::Loadable.unloadable BikeModelFactory
+
 class String
   def blank?
     strip.length == 0
