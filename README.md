@@ -2,6 +2,8 @@
 
 Bike brand and model information as a model, database migration, seed data, REST interface and more
 
+[![Build Status](https://travis-ci.org/zflat/bike_mfg.svg?branch=master)](https://travis-ci.org/zflat/bike_mfg)
+
 ## Installation
 
 Add this line to your application's Gemfile:
